@@ -6,27 +6,32 @@ import { AllOrdersScreen } from "../screens/AllOrdersScreen";
 const MainTab = createBottomTabNavigator();
 
 export const UseRoute = () => {
-  // const headerTitleStyle = {
-  //   fontFamily: "Roboto-Medium",
-  //   fontSize: 17,
-  //   lineHeight: 22,
+  const tabBarLabelStyle = {
+    fontFamily: "roboto.medium",
+    fontSize: 17,
+    lineHeight: 22,
 
-  //   textAlign: "center",
-  //   letterSpacing: -0.408,
-
-  //   color: "#212121",
-  // };
+    textAlign: "center",
+    letterSpacing: -0.408,
+  };
 
   return (
     <MainTab.Navigator
       initialRouteName="Catalog"
       screenOptions={{
-        tabBarShowLabel: false,
-        tabBarStyle: { height: 71, paddingHorizontal: 62 },
+        tabBarLabelStyle: tabBarLabelStyle,
+        tabBarShowLabel: true,
+        tabBarStyle: {
+          height: 71,
+          paddingHorizontal: 62,
+          backgroundColor: "#e7f4f6",
+        },
       }}
     >
       <MainTab.Screen
         options={{
+          tabBarIcon: ({ focused, color, size }) => null,
+          title: "Каталог",
           headerShown: false,
         }}
         name="Catalog"
@@ -34,21 +39,17 @@ export const UseRoute = () => {
       />
       <MainTab.Screen
         options={{
+          tabBarIcon: ({ focused, color, size }) => null,
+          title: "Заказ",
           headerShown: false,
-          headerRight: () => (
-            <FontAwesome
-              onPress={openModalForSave}
-              name="save"
-              size={24}
-              color="black"
-            />
-          ),
         }}
         name="Order"
         component={OrderScreen}
       />
       <MainTab.Screen
         options={{
+          tabBarIcon: ({ focused, color, size }) => null,
+          title: "Все заказы",
           unmountOnBlur: true,
           headerShown: false,
         }}

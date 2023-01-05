@@ -6,9 +6,9 @@ export const OrderModal = ({
   showModal,
   changeQty,
   onCloseModal,
-  currentQty = 1,
+  currentQty = "1",
 }) => {
-  const [numPadImput, setNumPadImput] = useState(currentQty);
+  const [numPadImput, setNumPadImput] = useState("");
 
   useEffect(() => {
     setNumPadImput(currentQty);
@@ -25,7 +25,10 @@ export const OrderModal = ({
   };
 
   const handleSubmitNumPad = () => {
-    changeQty(numPadImput);
+    if (numPadImput < 1) {
+      return;
+    }
+    changeQty(numPadImput.replace(/^0+/, ""));
     setNumPadImput(currentQty);
     onCloseModal();
   };

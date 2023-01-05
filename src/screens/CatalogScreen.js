@@ -44,7 +44,7 @@ export const CatalogScreen = () => {
 
   useEffect(() => {
     let index = 0;
-    price.forEach((item, idx) => {
+    foundProducts.findIndex((item, idx) => {
       if (item.article == searchValue) {
         index = idx;
       }
@@ -89,15 +89,25 @@ export const CatalogScreen = () => {
     setShowSearchModal(true);
   };
 
+  const removeInputValue = () => {
+    setSearchByNameValue("");
+  };
+
   const renderItem = ({ item }) => (
     <ScrollView contentContainerStyle={styles.catalogContainer}>
-      <Text style={styles.item}>{item.article}</Text>
       <DoubleClick
         doubleTap={() => createNewProduct(item.article, item.name, item.price)}
       >
-        <Text style={styles.item}>{item.name}</Text>
+        <View style={styles.itemContainer}>
+          <Text style={styles.item}>{item.article}</Text>
+
+          <Text numberOfLines={1} style={styles.item}>
+            {item.name}
+          </Text>
+
+          <Text style={styles.item}>{item.price}</Text>
+        </View>
       </DoubleClick>
-      <Text style={styles.item}>{item.price}</Text>
     </ScrollView>
   );
 
@@ -113,13 +123,26 @@ export const CatalogScreen = () => {
           />
           <Text style={styles.searchBtnText}>Поиск по артикулу</Text>
         </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          placeholder={"Поиск по названию"}
-          autoFocus={false}
-          value={searchByNameValue.toString()}
-          onChangeText={(value) => setSearchByNameValue(value)}
-        ></TextInput>
+        <View style={styles.inputSection}>
+          <TextInput
+            style={styles.input}
+            placeholder={"Поиск по наименованию"}
+            autoFocus={false}
+            value={searchByNameValue.toString()}
+            onChangeText={(value) => setSearchByNameValue(value)}
+          ></TextInput>
+          <FontAwesome
+            onPress={removeInputValue}
+            name="remove"
+            size={30}
+            color="red"
+          />
+        </View>
+      </View>
+      <View style={styles.priceHeader}>
+        <Text style={styles.priceHeaderText}>Код</Text>
+        <Text style={styles.priceHeaderText}>Наименование</Text>
+        <Text style={styles.priceHeaderText}>Цена</Text>
       </View>
       <BigList
         ref={catalogRef}
@@ -146,14 +169,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   catalogContainer: {
-    justifyContent: "space-between",
+    paddingHorizontal: 5,
+  },
+  itemContainer: {
+    flex: 0,
     flexDirection: "row",
+    borderTopWidth: 1,
+    borderColor: "blue",
+    justifyContent: "space-between",
+  },
+  item: {
+    maxWidth: "80%",
+    overflow: "hidden",
+    flexWrap: "wrap",
+    fontFamily: "roboto.medium",
+    fontSize: 18,
+    marginRight: 10,
+    paddingVertical: 15,
   },
   searhBar: {
     flexDirection: "row",
     justifyContent: "space-around",
     paddingVertical: 10,
-    marginBottom: 15,
+    marginBottom: 8,
     backgroundColor: "#e7f4f6",
     borderBottomWidth: 1,
     borderColor: "#223344",
@@ -177,18 +215,35 @@ const styles = StyleSheet.create({
     fontSize: 15,
     alignSelf: "center",
   },
+  inputSection: {
+    flexDirection: "row",
+  },
   input: {
     width: 300,
     borderWidth: 2,
     borderColor: "#000000",
     borderRadius: 8,
     paddingHorizontal: 10,
-  },
-  item: {
     marginRight: 10,
-    maxWidth: "100%",
-    height: 50,
-    borderBottomWidth: 1,
-    padding: 15,
+  },
+  priceHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 14,
+    marginBottom: 3,
+    paddingVertical: 3,
+  },
+  priceHeaderText: {
+    fontFamily: "roboto.medium",
+    fontSize: 18,
   },
 });

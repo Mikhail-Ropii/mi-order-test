@@ -54,21 +54,40 @@ export const OrderScreen = () => {
   };
 
   const renderItem = ({ item }) => (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.item}>{item.article}</Text>
-      <DoubleClick doubleTap={() => selectProduct(item.article, item.qty)}>
-        <Text style={styles.item}>{item.name}</Text>
-      </DoubleClick>
-      <Text style={styles.item}>{item.price}</Text>
-      <Text style={styles.item}>{item.qty}</Text>
-      <View>
-        <FontAwesome
-          onPress={() => handleOnPress(item.article)}
-          name="remove"
-          size={24}
-          color="black"
-        />
+    <ScrollView contentContainerStyle={styles.catalogContainer}>
+      <View style={{ flex: 1, alignSelf: "stretch", flexDirection: "row" }}>
+        <View style={{ flex: 1, alignSelf: "stretch" }}>
+          <Text>{item.article}</Text>
+        </View>
+        <View style={{ flex: 7, alignSelf: "stretch", width: "80%" }}>
+          <Text>{item.name}</Text>
+        </View>
+        <View style={{ flex: 3, alignSelf: "stretch" }}>
+          <Text>{item.price}</Text>
+        </View>
+        <View style={{ flex: 3, alignSelf: "stretch" }}>
+          <Text>{item.article}</Text>
+        </View>
+        <View style={{ flex: 1, alignSelf: "stretch" }}>
+          <Text>sdkjfhsjkdfkjkldjglkdjfgdlfk</Text>
+        </View>
       </View>
+      {/* <DoubleClick doubleTap={() => selectProduct(item.article, item.qty)}>
+        <View style={styles.itemContainer}>
+          <Text style={styles.item}>{item.article}</Text>
+          <Text numberOfLines={1} style={styles.item}>
+            {item.name}
+          </Text>
+          <Text style={styles.item}>{item.price}</Text>
+        </View>
+      </DoubleClick>
+      <FontAwesome
+        style={styles.removeIcon}
+        onPress={() => handleOnPress(item.article)}
+        name="remove"
+        size={32}
+        color="red"
+      /> */}
     </ScrollView>
   );
 
@@ -104,18 +123,35 @@ export const OrderScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: "space-between",
+  // container: {
+  //   justifyContent: "space-between",
+  //   flexDirection: "row",
+  // },
+  catalogContainer: {
     flexDirection: "row",
+    paddingHorizontal: 5,
   },
-  title: {
-    fontFamily: "roboto.bold",
+  itemContainer: {
+    flexDirection: "row",
+    borderTopWidth: 1,
+    borderColor: "blue",
+    justifyContent: "space-between",
   },
   item: {
+    maxWidth: "80%",
+    overflow: "hidden",
+    flexWrap: "wrap",
+    fontFamily: "roboto.medium",
+    fontSize: 18,
     marginRight: 10,
-    maxWidth: "100%",
-    height: 50,
-    borderBottomWidth: 1,
-    padding: 15,
+    paddingVertical: 15,
+  },
+  removeIcon: {
+    marginLeft: "auto",
+  },
+  title: {
+    textAlign: "center",
+    fontFamily: "roboto.bold",
+    fontSize: 15,
   },
 });
