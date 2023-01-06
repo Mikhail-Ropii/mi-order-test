@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StyleSheet, Modal, View, Button, Text } from "react-native";
+import { StyleSheet, Modal, View, TouchableOpacity, Text } from "react-native";
 import { NumPad } from "frontatish";
 
 export const SearchByArticleModal = ({
@@ -30,20 +30,25 @@ export const SearchByArticleModal = ({
       <View style={styles.centeredView}>
         <View style={styles.modal}>
           <View style={styles.numPad}>
-            <Text>{numPadImput}</Text>
+            <View style={styles.numPadValue}>
+              <Text style={styles.numPadValueText}>{numPadImput}</Text>
+            </View>
             <NumPad
               onItemClick={handleItemClick}
               onDeleteItem={handleDeleteItem}
               onSubmit={handleSubmitNumPad}
             />
           </View>
-          <Button
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.cancelBtn}
             onPress={() => {
               onCloseModal();
               setNumPadImput("");
             }}
-            title="X"
-          ></Button>
+          >
+            <Text style={styles.cancelBtnText}>Отмена</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -58,10 +63,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modal: {
+    paddingVertical: 20,
     display: "flex",
     width: 300,
-    height: 300,
-    backgroundColor: "white",
+    backgroundColor: "#ebedeb",
 
     borderRadius: 20,
     shadowColor: "#000",
@@ -72,5 +77,26 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  numPadValue: {
+    alignItems: "center",
+  },
+  numPadValueText: {
+    fontFamily: "roboto.medium",
+    fontSize: 25,
+  },
+  cancelBtn: {
+    alignSelf: "center",
+    alignItems: "center",
+    paddingVertical: 15,
+    width: "70%",
+    backgroundColor: "red",
+    marginTop: 20,
+    borderRadius: 20,
+  },
+  cancelBtnText: {
+    color: "white",
+    fontFamily: "roboto.medium",
+    fontSize: 20,
   },
 });

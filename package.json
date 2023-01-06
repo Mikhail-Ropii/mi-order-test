@@ -32,8 +32,7 @@
     "react-redux": "^8.0.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9",
-    "sharp-cli": "^4.1.0"
+    "@babel/core": "^7.12.9"
   },
   "private": false
 }

@@ -21,6 +21,9 @@ export const cartSlice = createSlice({
       const cart = state.cart.filter((product) => product.article != payload);
       return { ...state, cart };
     },
+    clearOrder: (state) => {
+      state.cart = [];
+    },
     addClientName: (state, { payload }) => {
       state.clientName = payload;
     },

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   FlatList,
+  View,
   Text,
   ScrollView,
   StyleSheet,
@@ -25,11 +26,15 @@ export const AllOrdersScreen = () => {
   }, []);
 
   const handleSendOrder = async (item) => {
-    await sendOrderByMail(item);
+    try {
+      await sendOrderByMail(item);
+    } catch (e) {
+      alert("Заказ не отправлен", e.message);
+    }
   };
 
   const renderItem = ({ item }) => (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.catalogContainer}>
       <Text style={styles.item}>{item}</Text>
       <TouchableOpacity
         activeOpacity={0.7}
@@ -42,20 +47,72 @@ export const AllOrdersScreen = () => {
   );
 
   return (
-    <>
+    <View style={styles.container}>
+      <View style={styles.topBar}>
+        <Text style={styles.title}>Все заказы</Text>
+      </View>
+      <View style={styles.priceHeader}>
+        <View style={{ flex: 4 }}>
+          <Text style={styles.priceHeaderText}>Клиент</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.priceHeaderText}>Дата</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.priceHeaderText}>Сумма</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.priceHeaderText}>Действие</Text>
+        </View>
+      </View>
       <FlatList
         data={allOrders}
         renderItem={renderItem}
         keyExtractor={(item) => item}
       />
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "space-between",
+    paddingHorizontal: 5,
+  },
+  catalogContainer: {
     flexDirection: "row",
+  },
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 7,
+    marginBottom: 8,
+    backgroundColor: "#e7f4f6",
+    borderBottomWidth: 1,
+    borderColor: "#223344",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  title: {
+    textAlign: "center",
+    fontFamily: "roboto.bold",
+    fontSize: 20,
+  },
+  priceHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 5,
+    marginBottom: 3,
+    paddingVertical: 3,
+  },
+  priceHeaderText: {
+    fontFamily: "roboto.medium",
+    fontSize: 18,
   },
   item: {
     marginRight: 10,

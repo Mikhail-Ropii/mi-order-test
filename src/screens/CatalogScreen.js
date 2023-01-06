@@ -95,25 +95,31 @@ export const CatalogScreen = () => {
 
   const renderItem = ({ item }) => (
     <ScrollView contentContainerStyle={styles.catalogContainer}>
-      <DoubleClick
-        doubleTap={() => createNewProduct(item.article, item.name, item.price)}
-      >
-        <View style={styles.itemContainer}>
+      <View style={styles.itemContainer}>
+        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.article}</Text>
-
-          <Text numberOfLines={1} style={styles.item}>
-            {item.name}
-          </Text>
-
+        </View>
+        <View style={{ flex: 8, alignSelf: "stretch" }}>
+          <DoubleClick
+            doubleTap={() =>
+              createNewProduct(item.article, item.name, item.price)
+            }
+          >
+            <Text numberOfLines={1} style={styles.item}>
+              {item.name}
+            </Text>
+          </DoubleClick>
+        </View>
+        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.price}</Text>
         </View>
-      </DoubleClick>
+      </View>
     </ScrollView>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.searhBar}>
+      <View style={styles.topBar}>
         <TouchableOpacity style={styles.searchBtn} onPress={findByArticle}>
           <FontAwesome
             style={styles.searchIcon}
@@ -140,9 +146,15 @@ export const CatalogScreen = () => {
         </View>
       </View>
       <View style={styles.priceHeader}>
-        <Text style={styles.priceHeaderText}>Код</Text>
-        <Text style={styles.priceHeaderText}>Наименование</Text>
-        <Text style={styles.priceHeaderText}>Цена</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.priceHeaderText}>Код</Text>
+        </View>
+        <View style={{ flex: 10 }}>
+          <Text style={styles.priceHeaderText}>Наименование</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.priceHeaderText}>Цена</Text>
+        </View>
       </View>
       <BigList
         ref={catalogRef}
@@ -169,25 +181,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   catalogContainer: {
+    flexDirection: "row",
     paddingHorizontal: 5,
+    justifyContent: "space-between",
+    borderBottomWidth: 1.5,
+    borderColor: "grey",
   },
   itemContainer: {
-    flex: 0,
+    flex: 16,
+    alignSelf: "stretch",
     flexDirection: "row",
-    borderTopWidth: 1,
-    borderColor: "blue",
-    justifyContent: "space-between",
   },
   item: {
-    maxWidth: "80%",
     overflow: "hidden",
     flexWrap: "wrap",
     fontFamily: "roboto.medium",
-    fontSize: 18,
-    marginRight: 10,
-    paddingVertical: 15,
+    fontSize: 16,
+    marginRight: 5,
+    paddingVertical: 10,
   },
-  searhBar: {
+  topBar: {
     flexDirection: "row",
     justifyContent: "space-around",
     paddingVertical: 10,
@@ -228,17 +241,8 @@ const styles = StyleSheet.create({
   },
   priceHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 5,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 14,
     marginBottom: 3,
     paddingVertical: 3,
   },
