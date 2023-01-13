@@ -4,7 +4,7 @@ import { StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
 import * as SplashScreen from "expo-splash-screen";
-import { ActivityModal } from "./src/components/ActivityModal";
+// import { ActivityModal } from "./src/components/ActivityModal";
 import { Main } from "./src/components/Main";
 
 export default function App() {
@@ -48,7 +48,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     position: "relative",
-    marginTop: 25,
     flex: 1,
     backgroundColor: "#fff",
   },

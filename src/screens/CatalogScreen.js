@@ -19,10 +19,12 @@ import { cartSlice } from "../redux/cart/cartReducer";
 import { FontAwesome } from "@expo/vector-icons";
 
 export const CatalogScreen = () => {
+  //Redux
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
-  const initialValue = { qty: 0 };
+  const discount = useSelector((state) => state.cart.discount);
   //State
+  const initialValue = { qty: 0 };
   const [addProduct, setAddProduct] = useState(initialValue);
   const [showModal, setShowModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -69,11 +71,13 @@ export const CatalogScreen = () => {
       name,
       price,
       qty: 0,
+      discount: discount,
+      priceDiscount: (price * (100 - discount)) / 100,
     };
     setAddProduct(product);
   };
   const addQty = (qty) => {
-    setAddProduct({ ...addProduct, qty });
+    setAddProduct({ ...addProduct, qty, sum: addProduct.priceDiscount * qty });
     closeQtyModal();
   };
 
@@ -111,7 +115,23 @@ export const CatalogScreen = () => {
           </DoubleClick>
         </View>
         <View style={{ flex: 0.8, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.price}</Text>
+          <Text
+            style={[
+              styles.item,
+              {
+                fontSize: 20,
+                color: item.availability === "Так" ? "green" : "red",
+              },
+            ]}
+          >
+            {item.availability === "Так" ? "+" : "-"}
+          </Text>
+        </View>
+        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
+          <Text style={styles.item}>{item.packQty}</Text>
+        </View>
+        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
+          <Text style={styles.item}>{item.price.toFixed(2)}</Text>
         </View>
       </View>
     </ScrollView>
@@ -127,12 +147,12 @@ export const CatalogScreen = () => {
             size={24}
             color="black"
           />
-          <Text style={styles.searchBtnText}>Поиск по артикулу</Text>
+          <Text style={styles.searchBtnText}>Пошук по коду</Text>
         </TouchableOpacity>
         <View style={styles.inputSection}>
           <TextInput
             style={styles.input}
-            placeholder={"Поиск по наименованию"}
+            placeholder={"Пошук по найменуванню"}
             autoFocus={false}
             value={searchByNameValue.toString()}
             onChangeText={(value) => setSearchByNameValue(value)}
@@ -150,10 +170,16 @@ export const CatalogScreen = () => {
           <Text style={styles.priceHeaderText}>Код</Text>
         </View>
         <View style={{ flex: 10 }}>
-          <Text style={styles.priceHeaderText}>Наименование</Text>
+          <Text style={styles.priceHeaderText}>Найменування</Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.priceHeaderText}>Цена</Text>
+          <Text style={styles.priceHeaderText}>Склад</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.priceHeaderText}>Уп.</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.priceHeaderText}>Ціна</Text>
         </View>
       </View>
       <BigList

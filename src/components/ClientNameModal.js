@@ -19,7 +19,7 @@ export const ClientNameModal = ({
     <Modal style={styles.modal} visible={showModal} transparent={true}>
       <View style={styles.centeredView}>
         <View style={styles.modal}>
-          <Text style={styles.title}>Введите имя клиента</Text>
+          <Text style={styles.title}>Введіть ім'я клієнта</Text>
           <TextInput
             style={styles.input}
             autoFocus={true}
@@ -32,14 +32,14 @@ export const ClientNameModal = ({
               style={styles.btn}
               onPress={() => onSetNameAndSave(value)}
             >
-              <Text style={styles.btnText}>Сохранить</Text>
+              <Text style={styles.btnText}>Зберегти</Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.btn}
               onPress={() => onCloseModal()}
             >
-              <Text style={styles.btnText}>Отмена</Text>
+              <Text style={styles.btnText}>Відміна</Text>
             </TouchableOpacity>
           </View>
         </View>

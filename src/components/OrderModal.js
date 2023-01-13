@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Modal, View, TouchableOpacity, Text } from "react-native";
-import { NumPad } from "frontatish";
+import { NumPad } from "./NumPad";
 
 export const OrderModal = ({
   showModal,
@@ -55,7 +55,7 @@ export const OrderModal = ({
               setNumPadImput(currentQty);
             }}
           >
-            <Text style={styles.cancelBtnText}>Отмена</Text>
+            <Text style={styles.cancelBtnText}>Відміна</Text>
           </TouchableOpacity>
         </View>
       </View>

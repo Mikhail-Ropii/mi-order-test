@@ -1,6 +1,13 @@
-import { FlatList, Text, ScrollView, StyleSheet, View } from "react-native";
+import {
+  FlatList,
+  Text,
+  ScrollView,
+  StyleSheet,
+  View,
+  TextInput,
+} from "react-native";
 import DoubleClick from "react-native-double-tap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OrderModal } from "../components/OrderModal";
 import { ClientNameModal } from "../components/ClientNameModal";
 //Api
@@ -14,15 +21,29 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 export const OrderScreen = () => {
   const dispatch = useDispatch();
+  const discount = useSelector((state) => state.cart.discount);
   const cart = useSelector((state) => state.cart.cart);
+  const [cartSum, setCartSum] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showClientNameModal, setShowClientNameModal] = useState(false);
-  const [currentArticle, setCurrentArticle] = useState();
+  const [currentItem, setCurrentItem] = useState();
   const [currentQty, setCurrentQty] = useState();
 
-  const selectProduct = (article, currentQty) => {
-    setCurrentQty(currentQty);
-    setCurrentArticle(article);
+  useEffect(() => {
+    dispatch(cartSlice.actions.changeDiscount());
+  }, [discount]);
+
+  useEffect(() => {
+    const sum = cart.reduce(
+      (total, { qty, priceDiscount }) => qty * priceDiscount + total,
+      0
+    );
+    setCartSum(sum);
+  }, [cart]);
+
+  const selectProduct = (item) => {
+    setCurrentQty(item.qty);
+    setCurrentItem(item);
     setShowModal(true);
   };
 
@@ -31,7 +52,7 @@ export const OrderScreen = () => {
   };
 
   const handleChangeQty = (qty) => {
-    dispatch(cartSlice.actions.changeQty({ qty, currentArticle }));
+    dispatch(cartSlice.actions.changeQty({ ...currentItem, qty }));
     closeQtyModal();
   };
 
@@ -53,10 +74,10 @@ export const OrderScreen = () => {
 
   const handleSetNameAndSave = async (clientName) => {
     try {
-      await saveOrderToStorage({ cart, clientName });
+      await saveOrderToStorage({ cart, cartSum, clientName });
       dispatch(cartSlice.actions.clearOrder());
-    } catch (e) {
-      alert("Заказ не сохранен", e.message);
+    } catch (error) {
+      alert("Замовлення не збережено");
     } finally {
       closeClientNameModal();
     }
@@ -69,24 +90,33 @@ export const OrderScreen = () => {
   const renderItem = ({ item }) => (
     <ScrollView contentContainerStyle={styles.catalogContainer}>
       <View style={styles.itemContainer}>
-        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
+        <View style={{ flex: 0.7, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.article}</Text>
         </View>
-        <View style={{ flex: 8, alignSelf: "stretch" }}>
-          <DoubleClick doubleTap={() => selectProduct(item.article, item.qty)}>
+        <View style={{ flex: 7, alignSelf: "stretch" }}>
+          <DoubleClick doubleTap={() => selectProduct(item)}>
             <Text numberOfLines={1} style={styles.item}>
               {item.name}
             </Text>
           </DoubleClick>
         </View>
-        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
+        <View style={{ flex: 1, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.price}</Text>
         </View>
-        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
+        <View style={{ flex: 1, alignSelf: "stretch" }}>
+          <Text style={styles.item}>{item.priceDiscount.toFixed(2)}</Text>
+        </View>
+        <View style={{ flex: 0.6, alignSelf: "stretch" }}>
+          <Text style={styles.item}>{item.discount}</Text>
+        </View>
+        <View style={{ flex: 0.6, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.qty}</Text>
         </View>
+        <View style={{ flex: 1, alignSelf: "stretch" }}>
+          <Text style={styles.item}>{item.sum.toFixed(2)}</Text>
+        </View>
       </View>
-      <View style={{ flex: 0.8, alignSelf: "stretch" }}>
+      <View style={{ flex: 1, alignSelf: "stretch" }}>
         <FontAwesome
           style={styles.removeIcon}
           onPress={() => handleOnPress(item.article)}
@@ -99,43 +129,67 @@ export const OrderScreen = () => {
   );
 
   return (
-    <>
+    <View>
       <View style={styles.topBar}>
-        <Text style={styles.title}>Текущий заказ</Text>
-        <MaterialIcons
-          onPress={openModalForSave}
-          name="save"
-          size={35}
-          color="green"
-        />
-        <MaterialIcons
-          onPress={clearOrder}
-          name="delete-forever"
-          size={35}
-          color="red"
-        />
+        <Text style={styles.title}>Поточне замовлення</Text>
+        <View style={styles.discountWrap}>
+          <Text style={styles.discountText}>Знижка, %</Text>
+          <TextInput
+            style={styles.input}
+            autoFocus={false}
+            numberOfLines={1}
+            keyboardType={"numeric"}
+            maxLength={2}
+            value={discount}
+            onChangeText={(value) =>
+              dispatch(cartSlice.actions.setDiscount(value))
+            }
+          ></TextInput>
+        </View>
+        <View style={styles.sumWrap}>
+          <Text style={styles.sumText}>Сума замовлення:</Text>
+          <Text style={styles.cartSumText}>{cartSum.toFixed(2)}</Text>
+        </View>
+        <View style={styles.topBarIconWrap}>
+          <MaterialIcons
+            style={{ marginRight: 25 }}
+            onPress={openModalForSave}
+            name="save"
+            size={35}
+            color="green"
+          />
+          <MaterialIcons
+            onPress={clearOrder}
+            name="delete-forever"
+            size={35}
+            color="red"
+          />
+        </View>
       </View>
       <View style={styles.priceHeader}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 0.7 }}>
           <Text style={styles.priceHeaderText}>Код</Text>
         </View>
-        <View style={{ flex: 8 }}>
-          <Text style={styles.priceHeaderText}>Наименование</Text>
+        <View style={{ flex: 7 }}>
+          <Text style={styles.priceHeaderText}>Найменування</Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.priceHeaderText}>Цена</Text>
+          <Text style={styles.priceHeaderText}>Ціна</Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.priceHeaderText}>Цена(%)</Text>
+          <Text style={styles.priceHeaderText}>Ціна(%)</Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 0.6 }}>
           <Text style={styles.priceHeaderText}>%</Text>
         </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.priceHeaderText}>Сумма</Text>
+        <View style={{ flex: 0.6 }}>
+          <Text style={styles.priceHeaderText}>Кіл.</Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.priceHeaderText}>Удалить</Text>
+          <Text style={styles.priceHeaderText}>Сума</Text>
+        </View>
+        <View style={{ flex: 0.8 }}>
+          <Text style={styles.priceHeaderText}>Видалити</Text>
         </View>
       </View>
       <FlatList
@@ -154,7 +208,7 @@ export const OrderScreen = () => {
         onCloseModal={closeClientNameModal}
         onSetNameAndSave={handleSetNameAndSave}
       />
-    </>
+    </View>
   );
 };
 
@@ -179,6 +233,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 5,
+  },
+  sumWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sumText: {
+    marginRight: 8,
+    fontFamily: "roboto.medium",
+    fontSize: 18,
+  },
+  cartSumText: {
+    fontFamily: "roboto.medium",
+    fontSize: 20,
+  },
+  topBarIconWrap: {
+    flexDirection: "row",
   },
   catalogContainer: {
     flexDirection: "row",
@@ -208,6 +279,25 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "roboto.bold",
     fontSize: 20,
+  },
+  discountWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  discountText: {
+    marginRight: 8,
+    fontFamily: "roboto.medium",
+    fontSize: 18,
+  },
+  input: {
+    fontSize: 16,
+    width: 40,
+    borderWidth: 2,
+    borderColor: "#000000",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginRight: 10,
   },
   priceHeader: {
     flexDirection: "row",

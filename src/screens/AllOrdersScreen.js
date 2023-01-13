@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   FlatList,
   View,
@@ -7,25 +8,28 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { sendOrderByMail } from "../api/sendOrderByMail";
+//DB
+import Realm from "realm";
+import { realmConfig } from "../db/schema";
+import { cartSlice } from "../redux/cart/cartReducer";
 
 export const AllOrdersScreen = () => {
+  const dispatch = useDispatch();
   const [allOrders, setAllOrders] = useState([]);
 
-  console.log(allOrders);
+  // console.log(allOrders);
 
   useEffect(() => {
     const getAllOrders = async () => {
-      try {
-        const orders = await AsyncStorage.getAllKeys();
-        setAllOrders(orders);
-      } catch (e) {}
+      const db = await Realm.open(realmConfig);
+      const orders = db.objects("Orders");
+      setAllOrders(orders);
     };
     getAllOrders();
   }, []);
 
-  const handleSendOrder = async (item) => {
+  const handleSendBtn = async (item) => {
     try {
       await sendOrderByMail(item);
     } catch (e) {
@@ -33,53 +37,101 @@ export const AllOrdersScreen = () => {
     }
   };
 
+  const handleChangeBtn = (item) => {
+    const foundOrder = allOrders.find((order) => {
+      order._id == item._id;
+      return item;
+    });
+    console.log(foundOrder);
+    const { items, _id } = foundOrder;
+    dispatch(cartSlice.actions.changeOrder({ items, _id }));
+  };
+
   const renderItem = ({ item }) => (
     <ScrollView contentContainerStyle={styles.catalogContainer}>
-      <Text style={styles.item}>{item}</Text>
-      <TouchableOpacity
-        activeOpacity={0.7}
-        style={styles.sendBtn}
-        onPress={() => handleSendOrder(item)}
-      >
-        <Text style={styles.sendBtnText}>Отправить</Text>
-      </TouchableOpacity>
+      <View style={{ flex: 4 }}>
+        <Text style={styles.item}>{item.clientName}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.item}>
+          {item.createAt.toJSON().slice(0, 10).split("-").reverse().join("/")}
+        </Text>
+      </View>
+      <View style={{ flex: 0.6 }}>
+        <Text style={styles.item}>{item.sum.toFixed(2)}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text
+          style={[
+            styles.item,
+            { color: item.status === "Збережено" ? "red" : "green" },
+          ]}
+        >
+          {item.status}
+        </Text>
+      </View>
+      <View style={[styles.btnWrap, { flex: 2 }]}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.sendBtn}
+          onPress={() => handleDeleteBtn(item)}
+        >
+          <Text style={styles.sendBtnText}>Видалити</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.sendBtn}
+          onPress={() => handleChangeBtn(item)}
+        >
+          <Text style={styles.sendBtnText}>Змінити</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.sendBtn}
+          onPress={() => handleSendBtn(item)}
+        >
+          <Text style={styles.sendBtnText}>Надіслати</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Text style={styles.title}>Все заказы</Text>
+        <Text style={styles.title}>Всі замовлення</Text>
       </View>
       <View style={styles.priceHeader}>
         <View style={{ flex: 4 }}>
-          <Text style={styles.priceHeaderText}>Клиент</Text>
+          <Text style={styles.priceHeaderText}>Клієнт</Text>
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Дата</Text>
         </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.priceHeaderText}>Сумма</Text>
+        <View style={{ flex: 0.6 }}>
+          <Text style={styles.priceHeaderText}>Сума</Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.priceHeaderText}>Действие</Text>
+          <Text style={styles.priceHeaderText}>Статус</Text>
+        </View>
+        <View style={{ flex: 2 }}>
+          <Text style={styles.priceHeaderText}>Дія</Text>
         </View>
       </View>
       <FlatList
         data={allOrders}
         renderItem={renderItem}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item._id}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 5,
-  },
   catalogContainer: {
     flexDirection: "row",
+    paddingHorizontal: 5,
   },
   topBar: {
     flexDirection: "row",
@@ -115,12 +167,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   item: {
-    marginRight: 10,
-    maxWidth: "100%",
-    height: 50,
+    overflow: "hidden",
+    flexWrap: "wrap",
+    fontFamily: "roboto.medium",
+    fontSize: 16,
+    marginRight: 5,
+    paddingVertical: 10,
     borderBottomWidth: 1,
-    padding: 15,
   },
+  btnWrap: { flexDirection: "row" },
   sendBtn: {
     marginTop: "auto",
     marginBottom: "auto",
@@ -130,6 +185,7 @@ const styles = StyleSheet.create({
     height: 40,
     backgroundColor: "#49b1e6",
     borderRadius: 100,
+    marginRight: 10,
   },
   sendBtnText: {
     fontFamily: "roboto.regular",

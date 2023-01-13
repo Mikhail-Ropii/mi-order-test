@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { StyleSheet, Modal, View, TouchableOpacity, Text } from "react-native";
-import { NumPad } from "frontatish";
+import { NumPad } from "./NumPad";
 
 export const SearchByArticleModal = ({
   showModal,
@@ -47,7 +47,7 @@ export const SearchByArticleModal = ({
               setNumPadImput("");
             }}
           >
-            <Text style={styles.cancelBtnText}>Отмена</Text>
+            <Text style={styles.btnText}>Відміна</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -85,6 +85,15 @@ const styles = StyleSheet.create({
     fontFamily: "roboto.medium",
     fontSize: 25,
   },
+  submitBtn: {
+    alignSelf: "center",
+    alignItems: "center",
+    paddingVertical: 15,
+    width: "70%",
+    backgroundColor: "green",
+    marginTop: 20,
+    borderRadius: 20,
+  },
   cancelBtn: {
     alignSelf: "center",
     alignItems: "center",
@@ -94,7 +103,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 20,
   },
-  cancelBtnText: {
+  btnText: {
     color: "white",
     fontFamily: "roboto.medium",
     fontSize: 20,
