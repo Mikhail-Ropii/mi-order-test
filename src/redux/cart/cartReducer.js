@@ -6,8 +6,12 @@ export const cartSlice = createSlice({
     cart: [],
     discount: 0,
     _id: null,
+    isLoading: false,
   },
   reducers: {
+    isLoading: (state, { payload }) => {
+      state.isLoading = payload;
+    },
     addToCart: (state, { payload }) => {
       state.cart.push(payload);
     },

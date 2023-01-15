@@ -6,6 +6,9 @@ import { store } from "./src/redux/store";
 import * as SplashScreen from "expo-splash-screen";
 // import { ActivityModal } from "./src/components/ActivityModal";
 import { Main } from "./src/components/Main";
+//DB
+import OrdersContext from "./src/db/schema";
+const { RealmProvider } = OrdersContext;
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -39,7 +42,9 @@ export default function App() {
     >
       <Provider store={store}>
         {/* <ActivityModal /> */}
-        <Main />
+        <RealmProvider>
+          <Main />
+        </RealmProvider>
       </Provider>
     </KeyboardAvoidingView>
   );

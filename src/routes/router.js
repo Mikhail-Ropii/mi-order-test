@@ -51,7 +51,7 @@ export const UseRoute = () => {
         options={{
           tabBarIcon: ({ focused, color, size }) => null,
           title: "Журнал",
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
           headerShown: false,
         }}
         name="AllOrders"

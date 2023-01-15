@@ -1,13 +1,22 @@
 import { useState } from "react";
-import { View, TextInput, StyleSheet } from "react-native";
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const SettingsScreen = () => {
-  const [name, setName] = useState;
+  const [name, setName] = useState();
 
   const handleSaveToStorage = async () => {
     try {
-    } catch (error) {}
+      await AsyncStorage.setItem("managerName", name);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
