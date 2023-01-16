@@ -1,7 +1,12 @@
 import Realm from "realm";
 import { realmConfig } from "../db/schema";
 
-export const saveOrderToStorage = async ({ cart, cartSum, clientName }) => {
+export const saveOrderToStorage = async ({
+  cart,
+  cartSum,
+  clientName,
+  discount,
+}) => {
   try {
     const db = await Realm.open(realmConfig);
     db.write(() => {
@@ -10,6 +15,7 @@ export const saveOrderToStorage = async ({ cart, cartSum, clientName }) => {
         clientName: `${clientName}`,
         status: "Збережено",
         createAt: new Date(),
+        discount: discount,
         sum: cartSum,
         items: cart,
       });

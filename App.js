@@ -4,7 +4,6 @@ import { StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
 import * as SplashScreen from "expo-splash-screen";
-// import { ActivityModal } from "./src/components/ActivityModal";
 import { Main } from "./src/components/Main";
 //DB
 import OrdersContext from "./src/db/schema";
@@ -41,7 +40,6 @@ export default function App() {
       style={styles.container}
     >
       <Provider store={store}>
-        {/* <ActivityModal /> */}
         <RealmProvider>
           <Main />
         </RealmProvider>

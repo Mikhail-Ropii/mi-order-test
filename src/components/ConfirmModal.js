@@ -5,7 +5,7 @@ export const ConfirmModal = ({ showModal, onConfirm, onReject, children }) => {
     <Modal style={styles.modal} visible={showModal} transparent={true}>
       <View style={styles.centeredView}>
         <View style={styles.modal}>
-          <Text>{children}</Text>
+          <Text style={styles.title}>{children}</Text>
           <View style={styles.btnContainer}>
             <TouchableOpacity
               activeOpacity={0.7}
@@ -56,16 +56,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: "center",
   },
-  input: {
-    fontFamily: "roboto.regular",
-    fontSize: 18,
-    minWidth: 400,
-    marginBottom: 40,
-    borderWidth: 2,
-    borderColor: "#000000",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-  },
   btnContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -81,8 +71,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   btnText: {
-    fontFamily: "roboto.regular",
-    fontSize: 18,
+    fontFamily: "roboto.medium",
+    fontSize: 21,
     lineHeight: 19,
 
     color: "#FFFFFF",

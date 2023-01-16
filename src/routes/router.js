@@ -23,7 +23,7 @@ export const UseRoute = () => {
         tabBarLabelStyle: tabBarLabelStyle,
         tabBarShowLabel: true,
         tabBarStyle: {
-          height: 71,
+          height: 60,
           paddingHorizontal: 62,
           backgroundColor: "#e7f4f6",
         },

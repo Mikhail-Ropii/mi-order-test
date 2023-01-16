@@ -7,7 +7,8 @@ export class Orders extends Realm.Object {
       _id: "objectId",
       clientName: "string",
       items: { type: "list", objectType: "Cart" },
-      sum: "int",
+      sum: "float",
+      discount: "int",
       status: "string?",
       createAt: "date",
     },
@@ -21,10 +22,10 @@ export class CartSchema extends Realm.Object {
     properties: {
       article: "int",
       name: "string",
-      price: "int",
-      priceDiscount: "int",
+      price: "float",
+      priceDiscount: "float",
       qty: "string",
-      sum: "int",
+      sum: "float",
     },
   };
 }

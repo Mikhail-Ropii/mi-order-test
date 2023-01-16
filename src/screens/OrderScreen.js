@@ -12,6 +12,7 @@ import { OrderModal } from "../components/OrderModal";
 import { ClientNameModal } from "../components/ClientNameModal";
 //Api
 import { saveOrderToStorage } from "../api/saveOrderToStorage";
+import { SaveExistingOrder } from "../api/SaveExistingOrder";
 //Redux
 import { useDispatch, useSelector } from "react-redux";
 import { cartSlice } from "../redux/cart/cartReducer";
@@ -22,6 +23,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 export const OrderScreen = () => {
   const dispatch = useDispatch();
   const discount = useSelector((state) => state.cart.discount);
+  const id = useSelector((state) => state.cart._id);
   const cart = useSelector((state) => state.cart.cart);
   const [cartSum, setCartSum] = useState(0);
   const [showModal, setShowModal] = useState(false);
@@ -66,15 +68,27 @@ export const OrderScreen = () => {
 
   const openModalForSave = () => {
     if (cart.length == 0) {
-      alert("Заказ пустой");
+      alert("Замовлення порожне");
       return;
     }
     setShowClientNameModal(true);
   };
 
   const handleSetNameAndSave = async (clientName) => {
+    if (id) {
+      try {
+        await SaveExistingOrder({ id, cart, cartSum, clientName, discount });
+        dispatch(cartSlice.actions.clearOrder());
+      } catch (error) {
+        console.log(error);
+        alert("Замовлення не збережено");
+      } finally {
+        closeClientNameModal();
+        return;
+      }
+    }
     try {
-      await saveOrderToStorage({ cart, cartSum, clientName });
+      await saveOrderToStorage({ cart, cartSum, clientName, discount });
       dispatch(cartSlice.actions.clearOrder());
     } catch (error) {
       alert("Замовлення не збережено");
@@ -90,10 +104,10 @@ export const OrderScreen = () => {
   const renderItem = ({ item }) => (
     <ScrollView contentContainerStyle={styles.catalogContainer}>
       <View style={styles.itemContainer}>
-        <View style={{ flex: 0.7, alignSelf: "stretch" }}>
+        <View style={{ flex: 1, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.article}</Text>
         </View>
-        <View style={{ flex: 7, alignSelf: "stretch" }}>
+        <View style={{ flex: 6, alignSelf: "stretch" }}>
           <DoubleClick doubleTap={() => selectProduct(item)}>
             <Text numberOfLines={1} style={styles.item}>
               {item.name}
@@ -101,18 +115,15 @@ export const OrderScreen = () => {
           </DoubleClick>
         </View>
         <View style={{ flex: 1, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.price}</Text>
+          <Text style={styles.item}>{item.price.toFixed(2)}</Text>
         </View>
         <View style={{ flex: 1, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.priceDiscount.toFixed(2)}</Text>
         </View>
-        <View style={{ flex: 0.6, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.discount}</Text>
-        </View>
-        <View style={{ flex: 0.6, alignSelf: "stretch" }}>
+        <View style={{ flex: 0.5, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.qty}</Text>
         </View>
-        <View style={{ flex: 1, alignSelf: "stretch" }}>
+        <View style={{ flex: 1.1, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.sum.toFixed(2)}</Text>
         </View>
       </View>
@@ -129,7 +140,7 @@ export const OrderScreen = () => {
   );
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={styles.topBar}>
         <Text style={styles.title}>Поточне замовлення</Text>
         <View style={styles.discountWrap}>
@@ -142,7 +153,7 @@ export const OrderScreen = () => {
             maxLength={2}
             value={discount}
             onChangeText={(value) =>
-              dispatch(cartSlice.actions.setDiscount(value))
+              dispatch(cartSlice.actions.setDiscount(parseInt(value)))
             }
           ></TextInput>
         </View>
@@ -167,10 +178,10 @@ export const OrderScreen = () => {
         </View>
       </View>
       <View style={styles.priceHeader}>
-        <View style={{ flex: 0.7 }}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Код</Text>
         </View>
-        <View style={{ flex: 7 }}>
+        <View style={{ flex: 6 }}>
           <Text style={styles.priceHeaderText}>Найменування</Text>
         </View>
         <View style={{ flex: 1 }}>
@@ -179,17 +190,14 @@ export const OrderScreen = () => {
         <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Ціна(%)</Text>
         </View>
-        <View style={{ flex: 0.6 }}>
-          <Text style={styles.priceHeaderText}>%</Text>
-        </View>
-        <View style={{ flex: 0.6 }}>
+        <View style={{ flex: 0.5 }}>
           <Text style={styles.priceHeaderText}>Кіл.</Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1.1 }}>
           <Text style={styles.priceHeaderText}>Сума</Text>
         </View>
         <View style={{ flex: 0.8 }}>
-          <Text style={styles.priceHeaderText}>Видалити</Text>
+          <Text style={styles.priceHeaderText}>Видал.</Text>
         </View>
       </View>
       <FlatList
@@ -214,12 +222,12 @@ export const OrderScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "space-between",
-    flexDirection: "row",
+    paddingBottom: 120,
   },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
+    paddingHorizontal: 10,
     paddingVertical: 7,
     marginBottom: 8,
     backgroundColor: "#e7f4f6",

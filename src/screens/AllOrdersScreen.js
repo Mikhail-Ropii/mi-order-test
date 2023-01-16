@@ -18,18 +18,18 @@ import { Entypo } from "@expo/vector-icons";
 //DB
 import OrdersContext, { Orders } from "../db/schema";
 const { useRealm, useQuery, useObject } = OrdersContext;
-
-import Realm from "realm";
-import { realmConfig } from "../db/schema";
 //Redux
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { cartSlice } from "../redux/cart/cartReducer";
 
-export const AllOrdersScreen = () => {
+export const AllOrdersScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+  const discount = useSelector((state) => state.cart.discount);
   const [allOrders, setAllOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showConfirmChangeModal, setShowConfirmChangeModal] = useState(false);
+  const [showConfirmSendModal, setShowConfirmSendModal] = useState(false);
   //Date Picker attributes
   const [range, setRange] = useState({
     startDate: undefined,
@@ -55,6 +55,7 @@ export const AllOrdersScreen = () => {
     [setOpen, setRange]
   );
   //End of Date Picker
+  const db = useRealm();
   const orders = useQuery(Orders);
   useEffect(() => {
     if (range.endDate && range.startDate) {
@@ -71,36 +72,70 @@ export const AllOrdersScreen = () => {
     setSelectedOrder(_id);
   };
 
-  const handleSendBtn = async (_id) => {
+  const handleSendBtn = () => {
+    setShowConfirmSendModal(true);
+  };
+  const handleRejectSend = () => {
+    setShowConfirmSendModal(false);
+  };
+  const handleConfirmSend = async () => {
     try {
       dispatch(cartSlice.actions.isLoading(true));
-      await sendOrderByMail(_id);
+      await sendOrderByMail(selectedOrder);
     } catch (e) {
-      alert("Замовлення не відправлене", e);
+      console.log(e);
     } finally {
       dispatch(cartSlice.actions.isLoading(false));
+      setShowConfirmSendModal(false);
     }
   };
 
-  const handleChangeBtn = (item) => {
+  const handleChangeBtn = () => {
+    if (!selectedOrder) {
+      alert("Виберіть замовлення");
+      return;
+    }
+    setShowConfirmChangeModal(true);
+  };
+  const handleConfirmChange = () => {
+    dispatch(cartSlice.actions.clearOrder());
     const foundOrder = allOrders.find((order) => {
-      order._id == item._id;
-      return item;
+      order._id == selectedOrder;
+      return order;
     });
-    console.log(foundOrder);
     const { items, _id } = foundOrder;
-    dispatch(cartSlice.actions.changeOrder({ items, _id }));
+    items.map((el) => {
+      const product = {
+        article: el.article,
+        name: el.name,
+        price: el.price,
+        qty: el.qty,
+        priceDiscount: (el.price * (100 - discount)) / 100,
+        sum: (el.qty * (el.price * (100 - discount))) / 100,
+      };
+      dispatch(cartSlice.actions.addToCart(product));
+    });
+    dispatch(cartSlice.actions.changeDiscount());
+    dispatch(cartSlice.actions.setId(_id));
+    navigation.navigate("Order");
+  };
+  const handleRejectChange = () => {
+    setShowConfirmChangeModal(false);
   };
 
   const handleDeleteBtn = () => {
+    if (!selectedOrder) {
+      alert("Виберіть замовлення");
+      return;
+    }
     setShowConfirmModal(true);
   };
-  const handleConfirmDelete = async () => {
-    const db = await Realm.open(realmConfig);
-    const order = Realm.objectForPrimaryKey("Orders", selectedOrder);
+  const handleConfirmDelete = () => {
+    const currentOrder = orders.filtered("_id= $0", selectedOrder);
     db.write(() => {
-      db.delete(order);
+      db.delete(currentOrder);
     });
+    setShowConfirmModal(false);
   };
   const handleRejectDelete = () => {
     setShowConfirmModal(false);
@@ -120,18 +155,20 @@ export const AllOrdersScreen = () => {
         style={styles.wrapper}
         onPress={() => handleSelectOrder(item._id)}
       >
-        <View style={{ flex: 4 }}>
-          <Text style={styles.item}>{item.clientName}</Text>
+        <View style={{ flex: 3 }}>
+          <Text numberOfLines={1} style={styles.item}>
+            {item.clientName}
+          </Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1.5 }}>
           <Text style={styles.item}>
             {item.createAt.toJSON().slice(0, 10).split("-").reverse().join("/")}
           </Text>
         </View>
-        <View style={{ flex: 0.6 }}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.item}>{item.sum.toFixed(2)}</Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1.2 }}>
           <Text
             style={[
               styles.item,
@@ -141,7 +178,7 @@ export const AllOrdersScreen = () => {
             {item.status}
           </Text>
         </View>
-        <View style={[styles.btnWrap, { flex: 2 }]}></View>
+        <View style={[styles.btnWrap, { flex: 1 }]}></View>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -161,21 +198,21 @@ export const AllOrdersScreen = () => {
         <View style={styles.btnWrap}>
           <TouchableOpacity
             activeOpacity={0.7}
-            style={styles.sendBtn}
+            style={styles.btn}
             onPress={handleDeleteBtn}
           >
             <MaterialIcons name="delete-forever" size={35} color="red" />
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={0.7}
-            style={styles.sendBtn}
-            onPress={() => handleChangeBtn(item)}
+            style={styles.btn}
+            onPress={handleChangeBtn}
           >
             <Entypo name="edit" size={35} color="#49b1e6" />
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={0.7}
-            style={styles.sendBtn}
+            style={styles.btn}
             onPress={handleSendBtn}
           >
             <FontAwesome name="send" size={35} color="green" />
@@ -183,20 +220,20 @@ export const AllOrdersScreen = () => {
         </View>
       </View>
       <View style={styles.priceHeader}>
-        <View style={{ flex: 4 }}>
+        <View style={{ flex: 3 }}>
           <Text style={styles.priceHeaderText}>Клієнт</Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1.5 }}>
           <Text style={styles.priceHeaderText}>Дата</Text>
         </View>
-        <View style={{ flex: 0.6 }}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Сума</Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1.2 }}>
           <Text style={styles.priceHeaderText}>Статус</Text>
         </View>
-        <View style={{ flex: 2 }}>
-          <Text style={styles.priceHeaderText}>Дія</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.priceHeaderText}>Инфо</Text>
         </View>
       </View>
       <FlatList
@@ -217,11 +254,28 @@ export const AllOrdersScreen = () => {
       >
         Підвердіть видалення замовлення
       </ConfirmModal>
+      <ConfirmModal
+        showModal={showConfirmChangeModal}
+        onConfirm={handleConfirmChange}
+        onReject={handleRejectChange}
+      >
+        Зміст поточного замовлення буде замінено.
+      </ConfirmModal>
+      <ConfirmModal
+        showModal={showConfirmSendModal}
+        onConfirm={handleConfirmSend}
+        onReject={handleRejectSend}
+      >
+        Відправити замовлення?
+      </ConfirmModal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    paddingBottom: 95,
+  },
   catalogContainer: {
     paddingHorizontal: 5,
   },
@@ -251,7 +305,9 @@ const styles = StyleSheet.create({
     fontFamily: "roboto.bold",
     fontSize: 20,
   },
-  btnWrap: { flexDirection: "row" },
+  btn: {
+    marginLeft: 10,
+  },
   priceHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -273,11 +329,4 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   btnWrap: { flexDirection: "row" },
-  sendBtnText: {
-    fontFamily: "roboto.regular",
-    fontSize: 16,
-    lineHeight: 19,
-
-    color: "#FFFFFF",
-  },
 });

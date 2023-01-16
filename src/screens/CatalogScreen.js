@@ -71,7 +71,6 @@ export const CatalogScreen = () => {
       name,
       price,
       qty: 0,
-      discount: discount,
       priceDiscount: (price * (100 - discount)) / 100,
     };
     setAddProduct(product);
@@ -100,7 +99,7 @@ export const CatalogScreen = () => {
   const renderItem = ({ item }) => (
     <ScrollView contentContainerStyle={styles.catalogContainer}>
       <View style={styles.itemContainer}>
-        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
+        <View style={{ flex: 1, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.article}</Text>
         </View>
         <View style={{ flex: 8, alignSelf: "stretch" }}>
@@ -127,10 +126,10 @@ export const CatalogScreen = () => {
             {item.availability === "Так" ? "+" : "-"}
           </Text>
         </View>
-        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
+        <View style={{ flex: 0.6, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.packQty}</Text>
         </View>
-        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
+        <View style={{ flex: 1.1, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.price.toFixed(2)}</Text>
         </View>
       </View>
@@ -169,16 +168,16 @@ export const CatalogScreen = () => {
         <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Код</Text>
         </View>
-        <View style={{ flex: 10 }}>
+        <View style={{ flex: 8 }}>
           <Text style={styles.priceHeaderText}>Найменування</Text>
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Склад</Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 0.6 }}>
           <Text style={styles.priceHeaderText}>Уп.</Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1.1 }}>
           <Text style={styles.priceHeaderText}>Ціна</Text>
         </View>
       </View>

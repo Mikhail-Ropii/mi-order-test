@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   TextInput,
@@ -9,7 +9,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const SettingsScreen = () => {
-  const [name, setName] = useState();
+  const [name, setName] = useState("");
 
   const handleSaveToStorage = async () => {
     try {
@@ -19,24 +19,72 @@ export const SettingsScreen = () => {
     }
   };
 
+  useEffect(() => {
+    const getSettings = async () => {
+      try {
+        const managerName = await AsyncStorage.getItem("managerName");
+        setName(managerName);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getSettings();
+  }, []);
+
   return (
-    <View>
-      <Text style={styles.nameText}>Ім'я представника</Text>
-      <TextInput
-        style={styles.input}
-        placeholder={"Введіть ПІБ"}
-        autoFocus={false}
-        value={name}
-        onChangeText={(value) => setName(value)}
-      ></TextInput>
-      <TouchableOpacity onPress={handleSaveToStorage} style={styles.btn}>
-        <Text>Зберегти</Text>
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <View style={styles.topBar}>
+        <Text style={styles.title}>Налаштування</Text>
+      </View>
+      <View style={styles.contentWrap}>
+        <Text style={styles.nameText}>Ім'я представника</Text>
+        <View style={styles.nameSetWrap}>
+          <TextInput
+            style={styles.input}
+            placeholder={"Введіть ПІБ"}
+            autoFocus={false}
+            value={name}
+            onChangeText={(value) => setName(value)}
+          ></TextInput>
+          <TouchableOpacity onPress={handleSaveToStorage} style={styles.btn}>
+            <Text>Зберегти</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    marginBottom: 8,
+    backgroundColor: "#e7f4f6",
+    borderBottomWidth: 1,
+    borderColor: "#223344",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  title: {
+    textAlign: "center",
+    fontFamily: "roboto.bold",
+    fontSize: 20,
+  },
+  contentWrap: {
+    paddingHorizontal: 5,
+  },
+  nameSetWrap: {
+    maxWidth: 320,
+  },
   input: {
     width: 300,
     borderWidth: 2,
@@ -44,18 +92,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     marginRight: 10,
+    marginBottom: 5,
   },
   nameText: {
     fontFamily: "roboto.medium",
     fontSize: 18,
+    marginBottom: 5,
   },
   btn: {
     marginTop: "auto",
     marginBottom: "auto",
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 15,
     paddingVertical: 15,
-    minWidth: 120,
+    alignSelf: "center",
     backgroundColor: "#49b1e6",
     borderRadius: 100,
   },

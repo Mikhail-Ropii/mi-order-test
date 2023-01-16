@@ -1,22 +1,28 @@
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 //DB
 import Realm from "realm";
 import { realmConfig } from "../db/schema";
 
-export const sendOrderByMail = async (_id) => {
+export const sendOrderByMail = async (id) => {
   try {
     const managerName = await AsyncStorage.getItem("managerName");
     const db = await Realm.open(realmConfig);
-    const order = db.objectForPrimaryKey("Orders", _id);
-    const { items, clientName } = order;
-    const response = axios.post("http://192.168.34.2:3000/sendOrder", {
+    const orders = db.objects("Orders");
+    const currentOrder = orders.filtered("_id= $0", id)[0];
+    const { items, clientName } = currentOrder;
+    const response = await axios.post("http://192.168.31.52:3000/sendOrder", {
       items,
       clientName,
       managerName,
     });
+    db.write(() => {
+      currentOrder.status = "Відправлено";
+    });
     let result = response.data;
     console.log(result);
   } catch (e) {
+    alert("Замовлення не відправлене", e);
     console.log(e);
   }
 };
