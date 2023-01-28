@@ -11,11 +11,14 @@ export const sendOrderByMail = async (id) => {
     const orders = db.objects("Orders");
     const currentOrder = orders.filtered("_id= $0", id)[0];
     const { items, clientName } = currentOrder;
-    const response = await axios.post("http://192.168.31.52:3000/sendOrder", {
-      items,
-      clientName,
-      managerName,
-    });
+    const response = await axios.post(
+      "https://mi-order-server.onrender.com/sendOrder",
+      {
+        items,
+        clientName,
+        managerName,
+      }
+    );
     db.write(() => {
       currentOrder.status = "Відправлено";
     });

@@ -10,6 +10,7 @@ import DoubleClick from "react-native-double-tap";
 import { useEffect, useState } from "react";
 import { OrderModal } from "../components/OrderModal";
 import { ClientNameModal } from "../components/ClientNameModal";
+import { ConfirmModal } from "../components/ConfirmModal";
 //Api
 import { saveOrderToStorage } from "../api/saveOrderToStorage";
 import { SaveExistingOrder } from "../api/SaveExistingOrder";
@@ -25,9 +26,11 @@ export const OrderScreen = () => {
   const discount = useSelector((state) => state.cart.discount);
   const id = useSelector((state) => state.cart._id);
   const cart = useSelector((state) => state.cart.cart);
+  //State
   const [cartSum, setCartSum] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showClientNameModal, setShowClientNameModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [currentItem, setCurrentItem] = useState();
   const [currentQty, setCurrentQty] = useState();
 
@@ -49,8 +52,12 @@ export const OrderScreen = () => {
     setShowModal(true);
   };
 
-  const clearOrder = () => {
+  const handleConfirmDelete = () => {
     dispatch(cartSlice.actions.clearOrder());
+    setShowConfirmModal(false);
+  };
+  const handleRejectDelete = () => {
+    setShowConfirmModal(false);
   };
 
   const handleChangeQty = (qty) => {
@@ -170,7 +177,7 @@ export const OrderScreen = () => {
             color="green"
           />
           <MaterialIcons
-            onPress={clearOrder}
+            onPress={() => setShowConfirmModal(true)}
             name="delete-forever"
             size={35}
             color="red"
@@ -216,6 +223,13 @@ export const OrderScreen = () => {
         onCloseModal={closeClientNameModal}
         onSetNameAndSave={handleSetNameAndSave}
       />
+      <ConfirmModal
+        showModal={showConfirmModal}
+        onConfirm={handleConfirmDelete}
+        onReject={handleRejectDelete}
+      >
+        Підвердіть очищення замовлення
+      </ConfirmModal>
     </View>
   );
 };

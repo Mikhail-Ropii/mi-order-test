@@ -51,7 +51,7 @@ export const CatalogScreen = () => {
         index = idx;
       }
     });
-    catalogRef.current.scrollToIndex({ index: index, animated: true });
+    catalogRef.current.scrollToIndex({ index: index, animated: false });
   }, [searchValue]);
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export const CatalogScreen = () => {
 
   const createNewProduct = (art, name, price) => {
     if (cart.find(({ article }) => article === art)) {
-      alert("Товар уже в заказе");
+      alert("Товар вже є у замовленні");
       return;
     }
     setShowModal(true);

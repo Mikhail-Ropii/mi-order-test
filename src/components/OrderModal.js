@@ -6,7 +6,7 @@ export const OrderModal = ({
   showModal,
   changeQty,
   onCloseModal,
-  currentQty = "1",
+  currentQty = "",
 }) => {
   const [numPadImput, setNumPadImput] = useState("");
 

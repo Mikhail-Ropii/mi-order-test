@@ -30,6 +30,7 @@ export const AllOrdersScreen = ({ navigation }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showConfirmChangeModal, setShowConfirmChangeModal] = useState(false);
   const [showConfirmSendModal, setShowConfirmSendModal] = useState(false);
+
   //Date Picker attributes
   const [range, setRange] = useState({
     startDate: undefined,
@@ -99,11 +100,10 @@ export const AllOrdersScreen = ({ navigation }) => {
   };
   const handleConfirmChange = () => {
     dispatch(cartSlice.actions.clearOrder());
-    const foundOrder = allOrders.find((order) => {
-      order._id == selectedOrder;
-      return order;
-    });
-    const { items, _id } = foundOrder;
+    const foundOrder = allOrders.find(
+      (order) => order._id.toString() == selectedOrder
+    );
+    const { items, _id, clientName } = foundOrder;
     items.map((el) => {
       const product = {
         article: el.article,
@@ -115,8 +115,9 @@ export const AllOrdersScreen = ({ navigation }) => {
       };
       dispatch(cartSlice.actions.addToCart(product));
     });
+    setShowConfirmChangeModal(false);
     dispatch(cartSlice.actions.changeDiscount());
-    dispatch(cartSlice.actions.setId(_id));
+    dispatch(cartSlice.actions.setCurrentClient({ _id, clientName }));
     navigation.navigate("Order");
   };
   const handleRejectChange = () => {

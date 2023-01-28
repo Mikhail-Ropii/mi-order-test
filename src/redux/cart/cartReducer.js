@@ -6,6 +6,7 @@ export const cartSlice = createSlice({
     cart: [],
     discount: 0,
     _id: null,
+    clientName: null,
     isLoading: false,
   },
   reducers: {
@@ -30,6 +31,7 @@ export const cartSlice = createSlice({
     clearOrder: (state) => {
       state.cart = [];
       state._id = null;
+      clientName = null;
     },
     addClientName: (state, { payload }) => {
       state.clientName = payload;
@@ -44,8 +46,9 @@ export const cartSlice = createSlice({
           (element.qty * (element.price * (100 - state.discount))) / 100;
       });
     },
-    setId: (state, { payload }) => {
-      state._id = payload;
+    setCurrentClient: (state, { payload }) => {
+      state._id = payload._id;
+      state.clientName = payload.clientName;
     },
   },
 });

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
+
 import {
   StyleSheet,
   Modal,
@@ -7,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
+import { useEffect } from "react";
 
 export const ClientNameModal = ({
   showModal,
@@ -14,6 +17,14 @@ export const ClientNameModal = ({
   onCloseModal,
 }) => {
   const [value, setValue] = useState("");
+  const clientName = useSelector((state) => state.cart.clientName);
+
+  useEffect(() => {
+    if (clientName) {
+      setValue(clientName);
+    }
+    return;
+  }, [clientName]);
 
   return (
     <Modal style={styles.modal} visible={showModal} transparent={true}>
@@ -30,14 +41,20 @@ export const ClientNameModal = ({
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.btn}
-              onPress={() => onSetNameAndSave(value)}
+              onPress={() => {
+                onSetNameAndSave(value);
+                setValue("");
+              }}
             >
               <Text style={styles.btnText}>Зберегти</Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.btn}
-              onPress={() => onCloseModal()}
+              onPress={() => {
+                onCloseModal();
+                setValue("");
+              }}
             >
               <Text style={styles.btnText}>Відміна</Text>
             </TouchableOpacity>
