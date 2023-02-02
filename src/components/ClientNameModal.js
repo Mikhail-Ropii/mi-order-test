@@ -22,8 +22,9 @@ export const ClientNameModal = ({
   useEffect(() => {
     if (clientName) {
       setValue(clientName);
+      return;
     }
-    return;
+    setValue("");
   }, [clientName]);
 
   return (
@@ -43,7 +44,6 @@ export const ClientNameModal = ({
               style={styles.btn}
               onPress={() => {
                 onSetNameAndSave(value);
-                setValue("");
               }}
             >
               <Text style={styles.btnText}>Зберегти</Text>
@@ -53,7 +53,6 @@ export const ClientNameModal = ({
               style={styles.btn}
               onPress={() => {
                 onCloseModal();
-                setValue("");
               }}
             >
               <Text style={styles.btnText}>Відміна</Text>

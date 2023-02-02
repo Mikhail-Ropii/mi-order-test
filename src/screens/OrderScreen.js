@@ -6,6 +6,7 @@ import {
   View,
   TextInput,
 } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 import DoubleClick from "react-native-double-tap";
 import { useEffect, useState } from "react";
 import { OrderModal } from "../components/OrderModal";
@@ -22,6 +23,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export const OrderScreen = () => {
+  const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const discount = useSelector((state) => state.cart.discount);
   const id = useSelector((state) => state.cart._id);
@@ -207,11 +209,13 @@ export const OrderScreen = () => {
           <Text style={styles.priceHeaderText}>Видал.</Text>
         </View>
       </View>
-      <FlatList
-        data={cart}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.article}
-      />
+      {isFocused && (
+        <FlatList
+          data={cart}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.article}
+        />
+      )}
       <OrderModal
         showModal={showModal}
         changeQty={handleChangeQty}
@@ -277,7 +281,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 5,
     justifyContent: "space-between",
-    borderBottomWidth: 1.5,
+    borderBottomWidth: 1,
     borderColor: "grey",
   },
   itemContainer: {

@@ -40,6 +40,7 @@ export const UseRoute = () => {
       />
       <MainTab.Screen
         options={{
+          // unmountOnBlur: true,
           tabBarIcon: ({ focused, color, size }) => null,
           title: "Замовлення",
           headerShown: false,
@@ -51,7 +52,6 @@ export const UseRoute = () => {
         options={{
           tabBarIcon: ({ focused, color, size }) => null,
           title: "Журнал",
-          // unmountOnBlur: true,
           headerShown: false,
         }}
         name="AllOrders"

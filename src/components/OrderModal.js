@@ -28,9 +28,9 @@ export const OrderModal = ({
     if (numPadImput < 1) {
       return;
     }
+    onCloseModal();
     changeQty(numPadImput.replace(/^0+/, ""));
     setNumPadImput(currentQty);
-    onCloseModal();
   };
 
   return (

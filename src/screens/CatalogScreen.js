@@ -54,12 +54,6 @@ export const CatalogScreen = () => {
     catalogRef.current.scrollToIndex({ index: index, animated: false });
   }, [searchValue]);
 
-  useEffect(() => {
-    if (addProduct.qty !== 0) {
-      dispatch(cartSlice.actions.addToCart(addProduct));
-    }
-  }, [addProduct]);
-
   const createNewProduct = (art, name, price) => {
     if (cart.find(({ article }) => article === art)) {
       alert("Товар вже є у замовленні");
@@ -76,8 +70,13 @@ export const CatalogScreen = () => {
     setAddProduct(product);
   };
   const addQty = (qty) => {
-    setAddProduct({ ...addProduct, qty, sum: addProduct.priceDiscount * qty });
-    closeQtyModal();
+    dispatch(
+      cartSlice.actions.addToCart({
+        ...addProduct,
+        qty,
+        sum: addProduct.priceDiscount * qty,
+      })
+    );
   };
 
   const closeQtyModal = () => {
@@ -118,7 +117,7 @@ export const CatalogScreen = () => {
             style={[
               styles.item,
               {
-                fontSize: 20,
+                fontSize: 18,
                 color: item.availability === "Так" ? "green" : "red",
               },
             ]}
@@ -209,7 +208,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 5,
     justifyContent: "space-between",
-    borderBottomWidth: 1.5,
+    borderBottomWidth: 1,
     borderColor: "grey",
   },
   itemContainer: {

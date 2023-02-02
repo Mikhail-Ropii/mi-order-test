@@ -1,11 +1,4 @@
-import {
-  Dimensions,
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
-const DeviceWidth = Dimensions.get("window").width;
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export const NumPad = ({ onItemClick, onDeleteItem, onSubmit }) => {
   return (

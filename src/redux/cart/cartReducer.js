@@ -14,7 +14,7 @@ export const cartSlice = createSlice({
       state.isLoading = payload;
     },
     addToCart: (state, { payload }) => {
-      state.cart.push(payload);
+      state.cart = state.cart.concat(payload);
     },
     changeQty: (state, { payload }) => {
       state.cart.map((product) => {
@@ -31,7 +31,7 @@ export const cartSlice = createSlice({
     clearOrder: (state) => {
       state.cart = [];
       state._id = null;
-      clientName = null;
+      state.clientName = null;
     },
     addClientName: (state, { payload }) => {
       state.clientName = payload;
