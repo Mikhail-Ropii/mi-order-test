@@ -7,11 +7,12 @@ import {
   View,
   TextInput,
 } from "react-native";
-import price from "../files/price.json";
 import DoubleClick from "react-native-double-tap";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { OrderModal } from "../components/OrderModal";
 import { SearchByArticleModal } from "../components/SearchByArticleModal";
+import { updatePrice } from "../api/updatePrice";
+import { setPriceToState } from "../api/setPriceToState";
 //Redux
 import { useDispatch, useSelector } from "react-redux";
 import { cartSlice } from "../redux/cart/cartReducer";
@@ -30,6 +31,18 @@ export const CatalogScreen = () => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [searchByNameValue, setSearchByNameValue] = useState("");
+  const [price, setPrice] = useState([]);
+  // console.log(price);
+
+  useEffect(() => {
+    const getPrice = async () => {
+      try {
+        const price = await setPriceToState();
+        setPrice(price);
+      } catch (error) {}
+    };
+    getPrice();
+  }, []);
 
   const catalogRef = useRef();
 
@@ -89,10 +102,28 @@ export const CatalogScreen = () => {
 
   const findByArticle = () => {
     setShowSearchModal(true);
+    if (searchValue) {
+      setSearchByNameValue("");
+    }
   };
 
   const removeInputValue = () => {
     setSearchByNameValue("");
+  };
+
+  const handleUpdatePrice = async () => {
+    try {
+      dispatch(cartSlice.actions.isLoading(true));
+      await updatePrice();
+      const price = await setPriceToState();
+      console.log(price);
+      setPrice(price);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      dispatch(cartSlice.actions.isLoading(false));
+      alert("Каталог оновлено");
+    }
   };
 
   const renderItem = ({ item }) => (
@@ -126,10 +157,19 @@ export const CatalogScreen = () => {
           </Text>
         </View>
         <View style={{ flex: 0.6, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.packQty}</Text>
+          <Text style={styles.item}>
+            {item.minPackQty}/{item.bigPackQty}
+          </Text>
         </View>
         <View style={{ flex: 1.1, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.price.toFixed(2)}</Text>
+          <Text
+            style={[
+              styles.item,
+              { color: item.isDiscount === "Ні" ? "red" : "inherit" },
+            ]}
+          >
+            {item.price.toFixed(2)}
+          </Text>
         </View>
       </View>
     </ScrollView>
@@ -138,29 +178,39 @@ export const CatalogScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <TouchableOpacity style={styles.searchBtn} onPress={findByArticle}>
+        <View>
           <FontAwesome
-            style={styles.searchIcon}
-            name="search"
-            size={24}
-            color="black"
-          />
-          <Text style={styles.searchBtnText}>Пошук по коду</Text>
-        </TouchableOpacity>
-        <View style={styles.inputSection}>
-          <TextInput
-            style={styles.input}
-            placeholder={"Пошук по найменуванню"}
-            autoFocus={false}
-            value={searchByNameValue.toString()}
-            onChangeText={(value) => setSearchByNameValue(value)}
-          ></TextInput>
-          <FontAwesome
-            onPress={removeInputValue}
-            name="remove"
+            onPress={handleUpdatePrice}
+            name="refresh"
             size={30}
-            color="red"
+            color="green"
           />
+        </View>
+        <View style={styles.searchBar}>
+          <TouchableOpacity style={styles.searchBtn} onPress={findByArticle}>
+            <FontAwesome
+              style={styles.searchIcon}
+              name="search"
+              size={24}
+              color="black"
+            />
+            <Text style={styles.searchBtnText}>Пошук по коду</Text>
+          </TouchableOpacity>
+          <View style={styles.inputSection}>
+            <TextInput
+              style={styles.input}
+              placeholder={"Пошук по найменуванню"}
+              autoFocus={false}
+              value={searchByNameValue.toString()}
+              onChangeText={(value) => setSearchByNameValue(value)}
+            ></TextInput>
+            <FontAwesome
+              onPress={removeInputValue}
+              name="remove"
+              size={30}
+              color="red"
+            />
+          </View>
         </View>
       </View>
       <View style={styles.priceHeader}>
@@ -225,8 +275,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   topBar: {
+    paddingHorizontal: 5,
+    alignItems: "center",
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     paddingVertical: 10,
     marginBottom: 8,
     backgroundColor: "#e7f4f6",
@@ -241,8 +293,15 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 60,
+  },
   searchBtn: {
     flexDirection: "row",
+    marginRight: 40,
   },
   searchIcon: {
     marginRight: 10,

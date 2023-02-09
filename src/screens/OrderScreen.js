@@ -116,7 +116,7 @@ export const OrderScreen = () => {
         <View style={{ flex: 1, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.article}</Text>
         </View>
-        <View style={{ flex: 6, alignSelf: "stretch" }}>
+        <View style={{ flex: 7, alignSelf: "stretch" }}>
           <DoubleClick doubleTap={() => selectProduct(item)}>
             <Text numberOfLines={1} style={styles.item}>
               {item.name}
@@ -132,11 +132,11 @@ export const OrderScreen = () => {
         <View style={{ flex: 0.5, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.qty}</Text>
         </View>
-        <View style={{ flex: 1.1, alignSelf: "stretch" }}>
+        <View style={{ flex: 1.2, alignSelf: "stretch" }}>
           <Text style={styles.item}>{item.sum.toFixed(2)}</Text>
         </View>
       </View>
-      <View style={{ flex: 1, alignSelf: "stretch" }}>
+      <View style={{ flex: 0.8, alignSelf: "stretch" }}>
         <FontAwesome
           style={styles.removeIcon}
           onPress={() => handleOnPress(item.article)}
@@ -190,7 +190,7 @@ export const OrderScreen = () => {
         <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Код</Text>
         </View>
-        <View style={{ flex: 6 }}>
+        <View style={{ flex: 7 }}>
           <Text style={styles.priceHeaderText}>Найменування</Text>
         </View>
         <View style={{ flex: 1 }}>
@@ -202,7 +202,7 @@ export const OrderScreen = () => {
         <View style={{ flex: 0.5 }}>
           <Text style={styles.priceHeaderText}>Кіл.</Text>
         </View>
-        <View style={{ flex: 1.1 }}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Сума</Text>
         </View>
         <View style={{ flex: 0.8 }}>

@@ -19,6 +19,7 @@ export const SaveExistingOrder = async ({
       currentOrder.sum = cartSum;
       currentOrder.discount = discount;
       currentOrder.status = "Збережено";
+      currentOrder.createAt = new Date();
     });
   } catch (error) {
     console.log(error);
