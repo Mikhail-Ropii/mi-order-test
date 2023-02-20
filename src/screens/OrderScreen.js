@@ -33,7 +33,7 @@ export const OrderScreen = () => {
   const [showModal, setShowModal] = useState(false);
   const [showClientNameModal, setShowClientNameModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [currentItem, setCurrentItem] = useState();
+  const [currentArticle, setCurrentArticle] = useState();
   const [currentQty, setCurrentQty] = useState();
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export const OrderScreen = () => {
 
   const selectProduct = (item) => {
     setCurrentQty(item.qty);
-    setCurrentItem(item);
+    setCurrentArticle(item.article);
     setShowModal(true);
   };
 
@@ -63,8 +63,7 @@ export const OrderScreen = () => {
   };
 
   const handleChangeQty = (qty) => {
-    dispatch(cartSlice.actions.changeQty({ ...currentItem, qty }));
-    closeQtyModal();
+    dispatch(cartSlice.actions.changeQty({ currentArticle, qty }));
   };
 
   const closeQtyModal = () => {
@@ -114,7 +113,9 @@ export const OrderScreen = () => {
     <ScrollView contentContainerStyle={styles.catalogContainer}>
       <View style={styles.itemContainer}>
         <View style={{ flex: 1, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.article}</Text>
+          <Text numberOfLines={1} style={styles.item}>
+            {item.article}
+          </Text>
         </View>
         <View style={{ flex: 7, alignSelf: "stretch" }}>
           <DoubleClick doubleTap={() => selectProduct(item)}>
@@ -124,24 +125,31 @@ export const OrderScreen = () => {
           </DoubleClick>
         </View>
         <View style={{ flex: 1, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.price.toFixed(2)}</Text>
+          <Text numberOfLines={1} style={styles.item}>
+            {item.price.toFixed(2)}
+          </Text>
         </View>
         <View style={{ flex: 1, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.priceDiscount.toFixed(2)}</Text>
+          <Text numberOfLines={1} style={styles.item}>
+            {item.priceDiscount.toFixed(2)}
+          </Text>
         </View>
         <View style={{ flex: 0.5, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.qty}</Text>
+          <Text numberOfLines={1} style={styles.item}>
+            {item.qty}
+          </Text>
         </View>
         <View style={{ flex: 1.2, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.sum.toFixed(2)}</Text>
+          <Text numberOfLines={1} style={styles.item}>
+            {item.sum.toFixed(2)}
+          </Text>
         </View>
       </View>
-      <View style={{ flex: 0.8, alignSelf: "stretch" }}>
+      <View style={{ flex: 0.8, alignSelf: "center" }}>
         <FontAwesome
-          style={styles.removeIcon}
           onPress={() => handleOnPress(item.article)}
           name="remove"
-          size={32}
+          size={35}
           color="red"
         />
       </View>
@@ -293,13 +301,9 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     flexWrap: "wrap",
     fontFamily: "roboto.medium",
-    fontSize: 16,
+    fontSize: 15,
     marginRight: 5,
-    paddingVertical: 10,
-  },
-  removeIcon: {
-    marginLeft: "auto",
-    marginRight: 20,
+    paddingVertical: 14,
   },
   title: {
     textAlign: "center",

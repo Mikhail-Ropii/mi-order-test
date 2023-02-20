@@ -18,9 +18,9 @@ export const cartSlice = createSlice({
     },
     changeQty: (state, { payload }) => {
       state.cart.map((product) => {
-        if (product.article === payload.article) {
+        if (product.article === payload.currentArticle) {
           product.qty = payload.qty;
-          product.sum = payload.qty * payload.priceDiscount;
+          product.sum = payload.qty * product.priceDiscount;
         }
       });
     },

@@ -1,14 +1,27 @@
 import * as FileSystem from "expo-file-system";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 export const updatePrice = async () => {
-  FileSystem.downloadAsync(
-    "https://drive.google.com/uc?export=download&confirm=no_antivirus&id=15CauftMFjNWp9LALRtVi8Zkfcpydv8tl",
-    FileSystem.documentDirectory + "price.json"
-  )
-    .then(({ uri }) => {
-      console.log("Finished downloading to ", uri);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  let passKey;
+  try {
+    passKey = await AsyncStorage.getItem("passKey");
+  } catch (error) {
+    throw error;
+  }
+  const config = {
+    headers: { Authorization: passKey },
+  };
+  try {
+    const response = await axios.get(
+      "https://mi-order-server.onrender.com/getprice",
+      config
+    );
+    const data = JSON.stringify(response.data);
+
+    const uri = FileSystem.documentDirectory + "price.json";
+    await FileSystem.writeAsStringAsync(uri, data);
+  } catch (error) {
+    throw error;
+  }
 };

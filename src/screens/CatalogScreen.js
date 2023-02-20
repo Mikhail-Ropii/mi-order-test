@@ -1,23 +1,24 @@
 import BigList from "react-native-big-list";
 import {
   Text,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
   TextInput,
 } from "react-native";
-import DoubleClick from "react-native-double-tap";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { OrderModal } from "../components/OrderModal";
 import { SearchByArticleModal } from "../components/SearchByArticleModal";
 import { updatePrice } from "../api/updatePrice";
 import { setPriceToState } from "../api/setPriceToState";
+import { CatalogList } from "../components/CatalogList";
+import { SettingsModal } from "../components/SettingsModal";
 //Redux
 import { useDispatch, useSelector } from "react-redux";
 import { cartSlice } from "../redux/cart/cartReducer";
 //Icons
 import { FontAwesome } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 export const CatalogScreen = () => {
   //Redux
@@ -25,14 +26,16 @@ export const CatalogScreen = () => {
   const cart = useSelector((state) => state.cart.cart);
   const discount = useSelector((state) => state.cart.discount);
   //State
-  const initialValue = { qty: 0 };
-  const [addProduct, setAddProduct] = useState(initialValue);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [searchByNameValue, setSearchByNameValue] = useState("");
   const [price, setPrice] = useState([]);
-  // console.log(price);
+  const [currentArticle, setCurrentArticle] = useState(null);
+  const [currentQty, setCurrentQty] = useState("");
+  const [autoQtyModal, setAutoQtyModal] = useState(false);
 
   useEffect(() => {
     const getPrice = async () => {
@@ -62,34 +65,52 @@ export const CatalogScreen = () => {
     foundProducts.findIndex((item, idx) => {
       if (item.article == searchValue) {
         index = idx;
+        setSelectedProduct(item.article);
       }
     });
     catalogRef.current.scrollToIndex({ index: index, animated: false });
   }, [searchValue]);
 
-  const createNewProduct = (art, name, price) => {
-    if (cart.find(({ article }) => article === art)) {
-      alert("Товар вже є у замовленні");
+  const handleChangeQty = (qty) => {
+    dispatch(cartSlice.actions.changeQty({ currentArticle, qty }));
+  };
+
+  const addProduct = (art) => {
+    const currentProduct = cart.find((product) => product.article === art);
+    if (currentProduct) {
+      setCurrentQty(currentProduct.qty);
+      setCurrentArticle(currentProduct.article);
+      setShowModal(true);
       return;
     }
+    setCurrentQty("");
     setShowModal(true);
-    const product = {
-      article: art,
-      name,
-      price,
-      qty: 0,
-      priceDiscount: (price * (100 - discount)) / 100,
-    };
-    setAddProduct(product);
+    const foundItem = foundProducts.find(({ article }) => article == art);
+    setCurrentArticle(foundItem.article);
   };
+
   const addQty = (qty) => {
+    if (cart.find((product) => product.article === currentArticle)) {
+      handleChangeQty(qty);
+      return;
+    }
+    const currentProduct = foundProducts.filter(
+      (product) => product.article == currentArticle
+    );
+    const { article, name, price } = currentProduct[0];
     dispatch(
       cartSlice.actions.addToCart({
-        ...addProduct,
+        article,
+        name,
+        price,
+        priceDiscount: (price * (100 - discount)) / 100,
         qty,
-        sum: addProduct.priceDiscount * qty,
+        sum: ((price * (100 - discount)) / 100) * qty,
       })
     );
+    if (autoQtyModal) {
+      setShowSearchModal(true);
+    }
   };
 
   const closeQtyModal = () => {
@@ -102,8 +123,16 @@ export const CatalogScreen = () => {
 
   const findByArticle = () => {
     setShowSearchModal(true);
-    if (searchValue) {
+    if (searchByNameValue) {
       setSearchByNameValue("");
+    }
+  };
+
+  const handleSetSearchValue = (art) => {
+    setSearchValue(art);
+    if (autoQtyModal) {
+      addProduct(art);
+      setShowModal(true);
     }
   };
 
@@ -116,74 +145,40 @@ export const CatalogScreen = () => {
       dispatch(cartSlice.actions.isLoading(true));
       await updatePrice();
       const price = await setPriceToState();
-      console.log(price);
       setPrice(price);
+      alert("Каталог оновлено");
     } catch (error) {
       console.log(error);
+      alert("Щось пішло не так:(");
     } finally {
       dispatch(cartSlice.actions.isLoading(false));
-      alert("Каталог оновлено");
     }
   };
 
-  const renderItem = ({ item }) => (
-    <ScrollView contentContainerStyle={styles.catalogContainer}>
-      <View style={styles.itemContainer}>
-        <View style={{ flex: 1, alignSelf: "stretch" }}>
-          <Text style={styles.item}>{item.article}</Text>
-        </View>
-        <View style={{ flex: 8, alignSelf: "stretch" }}>
-          <DoubleClick
-            doubleTap={() =>
-              createNewProduct(item.article, item.name, item.price)
-            }
-          >
-            <Text numberOfLines={1} style={styles.item}>
-              {item.name}
-            </Text>
-          </DoubleClick>
-        </View>
-        <View style={{ flex: 0.8, alignSelf: "stretch" }}>
-          <Text
-            style={[
-              styles.item,
-              {
-                fontSize: 18,
-                color: item.availability === "Так" ? "green" : "red",
-              },
-            ]}
-          >
-            {item.availability === "Так" ? "+" : "-"}
-          </Text>
-        </View>
-        <View style={{ flex: 0.6, alignSelf: "stretch" }}>
-          <Text style={styles.item}>
-            {item.minPackQty}/{item.bigPackQty}
-          </Text>
-        </View>
-        <View style={{ flex: 1.1, alignSelf: "stretch" }}>
-          <Text
-            style={[
-              styles.item,
-              { color: item.isDiscount === "Ні" ? "red" : "inherit" },
-            ]}
-          >
-            {item.price.toFixed(2)}
-          </Text>
-        </View>
-      </View>
-    </ScrollView>
-  );
+  const renderItem = useMemo(() => ({ item }) => (
+    <CatalogList
+      item={item}
+      selectedProduct={selectedProduct}
+      setSelectedProduct={setSelectedProduct}
+      addProduct={addProduct}
+    />
+  ));
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <View>
+        <View style={{ flexDirection: "row" }}>
           <FontAwesome
             onPress={handleUpdatePrice}
             name="refresh"
             size={30}
             color="green"
+          />
+          <Ionicons
+            onPress={() => setShowSettingsModal(true)}
+            name="settings-sharp"
+            size={30}
+            color="grey"
           />
         </View>
         <View style={styles.searchBar}>
@@ -220,13 +215,13 @@ export const CatalogScreen = () => {
         <View style={{ flex: 8 }}>
           <Text style={styles.priceHeaderText}>Найменування</Text>
         </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.priceHeaderText}>Склад</Text>
+        <View style={{ flex: 0.7 }}>
+          <Text style={styles.priceHeaderText}>Ск.</Text>
         </View>
-        <View style={{ flex: 0.6 }}>
+        <View style={{ flex: 0.8 }}>
           <Text style={styles.priceHeaderText}>Уп.</Text>
         </View>
-        <View style={{ flex: 1.1 }}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Ціна</Text>
         </View>
       </View>
@@ -239,12 +234,19 @@ export const CatalogScreen = () => {
       <SearchByArticleModal
         showModal={showSearchModal}
         onCloseModal={closeSearchModal}
-        onSetSearchValue={setSearchValue}
+        onSetSearchValue={handleSetSearchValue}
       />
       <OrderModal
         showModal={showModal}
         changeQty={addQty}
         onCloseModal={closeQtyModal}
+        currentQty={currentQty}
+      />
+      <SettingsModal
+        showModal={showSettingsModal}
+        autoQtyModal={autoQtyModal}
+        setAutoQtyModal={setAutoQtyModal}
+        onCloseModal={() => setShowSettingsModal(false)}
       />
     </View>
   );
@@ -253,26 +255,6 @@ export const CatalogScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  catalogContainer: {
-    flexDirection: "row",
-    paddingHorizontal: 5,
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderColor: "grey",
-  },
-  itemContainer: {
-    flex: 16,
-    alignSelf: "stretch",
-    flexDirection: "row",
-  },
-  item: {
-    overflow: "hidden",
-    flexWrap: "wrap",
-    fontFamily: "roboto.medium",
-    fontSize: 16,
-    marginRight: 5,
-    paddingVertical: 10,
   },
   topBar: {
     paddingHorizontal: 5,
@@ -293,7 +275,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-
   searchBar: {
     flexDirection: "row",
     alignItems: "center",

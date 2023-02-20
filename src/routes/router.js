@@ -40,7 +40,6 @@ export const UseRoute = () => {
       />
       <MainTab.Screen
         options={{
-          // unmountOnBlur: true,
           tabBarIcon: ({ focused, color, size }) => null,
           title: "Замовлення",
           headerShown: false,

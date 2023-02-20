@@ -9,12 +9,17 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const SettingsScreen = () => {
-  const [name, setName] = useState("");
+  const [managerName, setManagerName] = useState("");
+  const [passKey, setPassKey] = useState("");
 
   const handleSaveToStorage = async () => {
+    const name = ["managerName", managerName];
+    const pass = ["passKey", passKey];
     try {
-      await AsyncStorage.setItem("managerName", name);
+      await AsyncStorage.multiSet([name, pass]);
+      alert("Налаштування збережено");
     } catch (error) {
+      alert("Помилка збереження");
       console.log(error);
     }
   };
@@ -22,8 +27,9 @@ export const SettingsScreen = () => {
   useEffect(() => {
     const getSettings = async () => {
       try {
-        const managerName = await AsyncStorage.getItem("managerName");
-        setName(managerName);
+        const values = await AsyncStorage.multiGet(["managerName", "passKey"]);
+        setManagerName(values[0][1]);
+        setPassKey(values[1][1]);
       } catch (error) {
         console.log(error);
       }
@@ -43,11 +49,26 @@ export const SettingsScreen = () => {
             style={styles.input}
             placeholder={"Введіть ПІБ"}
             autoFocus={false}
-            value={name}
-            onChangeText={(value) => setName(value)}
+            value={managerName}
+            onChangeText={(value) => setManagerName(value)}
           ></TextInput>
-          <TouchableOpacity onPress={handleSaveToStorage} style={styles.btn}>
-            <Text>Зберегти</Text>
+        </View>
+        <Text style={styles.nameText}>Ключ доступу</Text>
+        <View style={styles.nameSetWrap}>
+          <TextInput
+            style={styles.input}
+            placeholder={"Введіть ключ доступу"}
+            secureTextEntry={true}
+            autoFocus={false}
+            value={passKey}
+            onChangeText={(value) => setPassKey(value)}
+          ></TextInput>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleSaveToStorage}
+            style={styles.btn}
+          >
+            <Text style={styles.btnText}>Зберегти</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -109,5 +130,10 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: "#49b1e6",
     borderRadius: 100,
+  },
+  btnText: {
+    fontFamily: "roboto.medium",
+    fontSize: 16,
+    color: "white",
   },
 });

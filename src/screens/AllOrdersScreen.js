@@ -156,12 +156,12 @@ export const AllOrdersScreen = ({ navigation }) => {
         style={styles.wrapper}
         onPress={() => handleSelectOrder(item._id)}
       >
-        <View style={{ flex: 3 }}>
+        <View style={{ flex: 7 }}>
           <Text numberOfLines={1} style={styles.item}>
             {item.clientName}
           </Text>
         </View>
-        <View style={{ flex: 1.5 }}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.item}>
             {item.createAt.toJSON().slice(0, 10).split("-").reverse().join("/")}
           </Text>
@@ -221,10 +221,10 @@ export const AllOrdersScreen = ({ navigation }) => {
         </View>
       </View>
       <View style={styles.priceHeader}>
-        <View style={{ flex: 3 }}>
+        <View style={{ flex: 7 }}>
           <Text style={styles.priceHeaderText}>Клієнт</Text>
         </View>
-        <View style={{ flex: 1.5 }}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Дата</Text>
         </View>
         <View style={{ flex: 1 }}>

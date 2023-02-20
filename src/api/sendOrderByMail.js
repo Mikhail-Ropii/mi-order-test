@@ -12,7 +12,7 @@ export const sendOrderByMail = async (id) => {
     const currentOrder = orders.filtered("_id= $0", id)[0];
     const { items, clientName } = currentOrder;
     const response = await axios.post(
-      "https://mi-order-server.onrender.com/sendOrder",
+      "https://mi-order-server.onrender.com/sendorder",
       {
         items,
         clientName,
