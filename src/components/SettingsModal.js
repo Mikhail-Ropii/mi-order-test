@@ -11,12 +11,14 @@ export const SettingsModal = ({
     <Modal visible={showModal} transparent={true}>
       <View style={styles.container}>
         <View style={styles.modal}>
-          <Checkbox
-            style={styles.checkbox}
-            value={autoQtyModal}
-            onValueChange={setAutoQtyModal}
-          />
-          <Text style={styles.text}>Підбирати товар при пошуку по коду</Text>
+          <View style={styles.checkWrap}>
+            <Checkbox
+              style={styles.checkbox}
+              value={autoQtyModal}
+              onValueChange={setAutoQtyModal}
+            />
+            <Text style={styles.text}>Підбирати товар при пошуку по коду</Text>
+          </View>
           <TouchableOpacity
             activeOpacity={0.7}
             style={styles.cancelBtn}
@@ -43,7 +45,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     display: "flex",
-    width: 300,
     backgroundColor: "#ebedeb",
 
     borderRadius: 20,
@@ -56,6 +57,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  checkWrap: { flexDirection: "row" },
   checkbox: {
     marginRight: 8,
   },
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignItems: "center",
     paddingVertical: 15,
-    width: "70%",
+    paddingHorizontal: 15,
     backgroundColor: "green",
     marginTop: 20,
     borderRadius: 20,

@@ -105,12 +105,12 @@ export const OrderScreen = () => {
     }
   };
 
-  const handleOnPress = (art) => {
+  const handleOnPressDelete = (art) => {
     dispatch(cartSlice.actions.deleteProduct(art));
   };
 
   const renderItem = ({ item }) => (
-    <ScrollView contentContainerStyle={styles.catalogContainer}>
+    <View style={styles.catalogContainer}>
       <View style={styles.itemContainer}>
         <View style={{ flex: 1, alignSelf: "stretch" }}>
           <Text numberOfLines={1} style={styles.item}>
@@ -147,13 +147,13 @@ export const OrderScreen = () => {
       </View>
       <View style={{ flex: 0.8, alignSelf: "center" }}>
         <FontAwesome
-          onPress={() => handleOnPress(item.article)}
+          onPress={() => handleOnPressDelete(item.article)}
           name="remove"
           size={35}
           color="red"
         />
       </View>
-    </ScrollView>
+    </View>
   );
 
   return (

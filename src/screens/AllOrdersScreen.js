@@ -10,11 +10,13 @@ import {
 import { sendOrderByMail } from "../api/sendOrderByMail";
 import { DatePicker } from "../components/DatePicker";
 import { ConfirmModal } from "../components/ConfirmModal";
+import { OrderInfoModal } from "../components/OrderInfoModal";
 
 //Icons
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 //DB
 import OrdersContext, { Orders } from "../db/schema";
 const { useRealm, useQuery, useObject } = OrdersContext;
@@ -26,10 +28,12 @@ export const AllOrdersScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const discount = useSelector((state) => state.cart.discount);
   const [allOrders, setAllOrders] = useState([]);
+  const [orderInfo, setOrdeInfo] = useState();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showConfirmChangeModal, setShowConfirmChangeModal] = useState(false);
   const [showConfirmSendModal, setShowConfirmSendModal] = useState(false);
+  const [showOrderInfoModal, setShowOrderInfoModal] = useState(false);
 
   //Date Picker attributes
   const [range, setRange] = useState({
@@ -142,9 +146,14 @@ export const AllOrdersScreen = ({ navigation }) => {
     setShowConfirmModal(false);
   };
 
+  const getOrderInfo = ({ clientName, discount, items }) => {
+    setOrdeInfo({ clientName, discount, items });
+    setShowOrderInfoModal(true);
+  };
+
   const renderItem = ({ item }) => (
-    <ScrollView
-      contentContainerStyle={[
+    <View
+      style={[
         styles.catalogContainer,
         {
           backgroundColor:
@@ -179,9 +188,21 @@ export const AllOrdersScreen = ({ navigation }) => {
             {item.status}
           </Text>
         </View>
-        <View style={[styles.btnWrap, { flex: 1 }]}></View>
+        <View
+          style={[
+            styles.btnWrap,
+            { flex: 0.8, alignSelf: "center", justifyContent: "center" },
+          ]}
+        >
+          <AntDesign
+            onPress={() => getOrderInfo(item)}
+            name="infocirlce"
+            size={30}
+            color="black"
+          />
+        </View>
       </TouchableOpacity>
-    </ScrollView>
+    </View>
   );
 
   return (
@@ -233,7 +254,7 @@ export const AllOrdersScreen = ({ navigation }) => {
         <View style={{ flex: 1.2 }}>
           <Text style={styles.priceHeaderText}>Статус</Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 0.8 }}>
           <Text style={styles.priceHeaderText}>Инфо</Text>
         </View>
       </View>
@@ -248,6 +269,13 @@ export const AllOrdersScreen = ({ navigation }) => {
         range={range}
         onConfirm={onConfirm}
       />
+      {orderInfo && (
+        <OrderInfoModal
+          onCloseModal={() => setShowOrderInfoModal(false)}
+          showModal={showOrderInfoModal}
+          orderInfo={orderInfo}
+        />
+      )}
       <ConfirmModal
         showModal={showConfirmModal}
         onConfirm={handleConfirmDelete}

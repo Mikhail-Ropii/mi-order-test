@@ -175,6 +175,7 @@ export const CatalogScreen = () => {
             color="green"
           />
           <Ionicons
+            style={styles.settingsIcon}
             onPress={() => setShowSettingsModal(true)}
             name="settings-sharp"
             size={30}
@@ -275,6 +276,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  settingsIcon: { marginLeft: 20 },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
