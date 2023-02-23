@@ -6,6 +6,7 @@ export const OrderModal = ({
   showModal,
   changeQty,
   onCloseModal,
+  onSetOffAutoQtyModal,
   currentQty = "",
 }) => {
   const [numPadImput, setNumPadImput] = useState("");
@@ -37,6 +38,7 @@ export const OrderModal = ({
     <Modal visible={showModal} transparent={true}>
       <View style={styles.centeredView}>
         <View style={styles.modal}>
+          <Text style={styles.title}>Кількість</Text>
           <View style={styles.numPad}>
             <View style={styles.numPadValue}>
               <Text style={styles.numPadValueText}>{numPadImput}</Text>
@@ -51,6 +53,7 @@ export const OrderModal = ({
             activeOpacity={0.7}
             style={styles.cancelBtn}
             onPress={() => {
+              onSetOffAutoQtyModal();
               onCloseModal();
               setNumPadImput(currentQty);
             }}
@@ -71,7 +74,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modal: {
-    paddingVertical: 20,
+    paddingVertical: 10,
     display: "flex",
     width: 300,
     backgroundColor: "#ebedeb",
@@ -85,6 +88,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  title: {
+    fontFamily: "roboto.medium",
+    fontSize: 18,
+    alignSelf: "center",
   },
   numPadValue: {
     alignItems: "center",

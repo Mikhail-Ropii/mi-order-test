@@ -58,20 +58,9 @@ export const OrderScreen = () => {
     dispatch(cartSlice.actions.clearOrder());
     setShowConfirmModal(false);
   };
-  const handleRejectDelete = () => {
-    setShowConfirmModal(false);
-  };
 
   const handleChangeQty = (qty) => {
     dispatch(cartSlice.actions.changeQty({ currentArticle, qty }));
-  };
-
-  const closeQtyModal = () => {
-    setShowModal(false);
-  };
-
-  const closeClientNameModal = () => {
-    setShowClientNameModal(false);
   };
 
   const openModalForSave = () => {
@@ -91,7 +80,7 @@ export const OrderScreen = () => {
         console.log(error);
         alert("Замовлення не збережено");
       } finally {
-        closeClientNameModal();
+        setShowClientNameModal(false);
         return;
       }
     }
@@ -101,7 +90,7 @@ export const OrderScreen = () => {
     } catch (error) {
       alert("Замовлення не збережено");
     } finally {
-      closeClientNameModal();
+      setShowClientNameModal(false);
     }
   };
 
@@ -227,18 +216,18 @@ export const OrderScreen = () => {
       <OrderModal
         showModal={showModal}
         changeQty={handleChangeQty}
-        onCloseModal={closeQtyModal}
+        onCloseModal={() => setShowModal(false)}
         currentQty={currentQty}
       />
       <ClientNameModal
         showModal={showClientNameModal}
-        onCloseModal={closeClientNameModal}
+        onCloseModal={() => setShowClientNameModal(false)}
         onSetNameAndSave={handleSetNameAndSave}
       />
       <ConfirmModal
         showModal={showConfirmModal}
         onConfirm={handleConfirmDelete}
-        onReject={handleRejectDelete}
+        onReject={() => setShowConfirmModal(false)}
       >
         Підвердіть очищення замовлення
       </ConfirmModal>

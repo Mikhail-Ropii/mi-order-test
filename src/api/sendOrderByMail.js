@@ -11,10 +11,17 @@ export const sendOrderByMail = async (id) => {
     const orders = db.objects("Orders");
     const currentOrder = orders.filtered("_id= $0", id)[0];
     const { items, clientName } = currentOrder;
+    const orderItems = JSON.parse(JSON.stringify(items)).map((item) => {
+      delete item.name;
+      delete item.price;
+      delete item.priceDiscount;
+      delete item.sum;
+      return item;
+    });
     const response = await axios.post(
       "https://mi-order-server.onrender.com/sendorder",
       {
-        items,
+        orderItems,
         clientName,
         managerName,
       }

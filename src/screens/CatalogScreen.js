@@ -9,10 +9,13 @@ import {
 import { useEffect, useRef, useState, useMemo } from "react";
 import { OrderModal } from "../components/OrderModal";
 import { SearchByArticleModal } from "../components/SearchByArticleModal";
-import { updatePrice } from "../api/updatePrice";
-import { setPriceToState } from "../api/setPriceToState";
 import { CatalogList } from "../components/CatalogList";
 import { SettingsModal } from "../components/SettingsModal";
+//Functional
+import { updatePrice } from "../api/updatePrice";
+import { setPriceToState } from "../api/setPriceToState";
+import { setCatalogSettings } from "../api/setCatalogSettings";
+import { getCatalogSettings } from "../api/getCatalogSettings";
 //Redux
 import { useDispatch, useSelector } from "react-redux";
 import { cartSlice } from "../redux/cart/cartReducer";
@@ -27,7 +30,7 @@ export const CatalogScreen = () => {
   const discount = useSelector((state) => state.cart.discount);
   //State
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [showQtyModal, setShowQtyModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -35,17 +38,26 @@ export const CatalogScreen = () => {
   const [price, setPrice] = useState([]);
   const [currentArticle, setCurrentArticle] = useState(null);
   const [currentQty, setCurrentQty] = useState("");
-  const [autoQtyModal, setAutoQtyModal] = useState(false);
+  const [autoQtyModal, setAutoQtyModal] = useState(null);
+  const [autoQtyModalOn, setAutoQtyModalOn] = useState(false);
 
   useEffect(() => {
-    const getPrice = async () => {
+    const getPriceAndSettings = async () => {
       try {
         const price = await setPriceToState();
         setPrice(price);
+        const isAutoQtyModal = await getCatalogSettings();
+        setAutoQtyModal(isAutoQtyModal);
       } catch (error) {}
     };
-    getPrice();
+    getPriceAndSettings();
   }, []);
+
+  useEffect(() => {
+    if (autoQtyModal !== null) {
+      setCatalogSettings(autoQtyModal);
+    }
+  }, [autoQtyModal]);
 
   const catalogRef = useRef();
 
@@ -80,45 +92,40 @@ export const CatalogScreen = () => {
     if (currentProduct) {
       setCurrentQty(currentProduct.qty);
       setCurrentArticle(currentProduct.article);
-      setShowModal(true);
+      setShowQtyModal(true);
       return;
     }
     setCurrentQty("");
-    setShowModal(true);
     const foundItem = foundProducts.find(({ article }) => article == art);
-    setCurrentArticle(foundItem.article);
+    if (foundItem) {
+      setShowQtyModal(true);
+      setCurrentArticle(foundItem.article);
+    }
   };
 
   const addQty = (qty) => {
     if (cart.find((product) => product.article === currentArticle)) {
       handleChangeQty(qty);
-      return;
+    } else {
+      const currentProduct = foundProducts.filter(
+        (product) => product.article == currentArticle
+      );
+      const { article, name, price } = currentProduct[0];
+      dispatch(
+        cartSlice.actions.addToCart({
+          article,
+          name,
+          price,
+          priceDiscount: (price * (100 - discount)) / 100,
+          qty,
+          sum: ((price * (100 - discount)) / 100) * qty,
+        })
+      );
     }
-    const currentProduct = foundProducts.filter(
-      (product) => product.article == currentArticle
-    );
-    const { article, name, price } = currentProduct[0];
-    dispatch(
-      cartSlice.actions.addToCart({
-        article,
-        name,
-        price,
-        priceDiscount: (price * (100 - discount)) / 100,
-        qty,
-        sum: ((price * (100 - discount)) / 100) * qty,
-      })
-    );
-    if (autoQtyModal) {
+
+    if (autoQtyModalOn) {
       setShowSearchModal(true);
     }
-  };
-
-  const closeQtyModal = () => {
-    setShowModal(false);
-  };
-
-  const closeSearchModal = () => {
-    setShowSearchModal(false);
   };
 
   const findByArticle = () => {
@@ -131,13 +138,9 @@ export const CatalogScreen = () => {
   const handleSetSearchValue = (art) => {
     setSearchValue(art);
     if (autoQtyModal) {
+      setAutoQtyModalOn(true);
       addProduct(art);
-      setShowModal(true);
     }
-  };
-
-  const removeInputValue = () => {
-    setSearchByNameValue("");
   };
 
   const handleUpdatePrice = async () => {
@@ -201,7 +204,7 @@ export const CatalogScreen = () => {
               onChangeText={(value) => setSearchByNameValue(value)}
             ></TextInput>
             <FontAwesome
-              onPress={removeInputValue}
+              onPress={() => setSearchByNameValue("")}
               name="remove"
               size={30}
               color="red"
@@ -234,13 +237,15 @@ export const CatalogScreen = () => {
       />
       <SearchByArticleModal
         showModal={showSearchModal}
-        onCloseModal={closeSearchModal}
+        onCloseModal={() => setShowSearchModal(false)}
+        onSetOffAutoQtyModal={() => setAutoQtyModalOn(false)}
         onSetSearchValue={handleSetSearchValue}
       />
       <OrderModal
-        showModal={showModal}
+        showModal={showQtyModal}
         changeQty={addQty}
-        onCloseModal={closeQtyModal}
+        onCloseModal={() => setShowQtyModal(false)}
+        onSetOffAutoQtyModal={() => setAutoQtyModalOn(false)}
         currentQty={currentQty}
       />
       <SettingsModal
