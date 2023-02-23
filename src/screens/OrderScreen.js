@@ -14,7 +14,7 @@ import { ClientNameModal } from "../components/ClientNameModal";
 import { ConfirmModal } from "../components/ConfirmModal";
 //Api
 import { saveOrderToStorage } from "../api/saveOrderToStorage";
-import { SaveExistingOrder } from "../api/SaveExistingOrder";
+import { saveExistingOrder } from "../api/saveExistingOrder";
 //Redux
 import { useDispatch, useSelector } from "react-redux";
 import { cartSlice } from "../redux/cart/cartReducer";
@@ -74,7 +74,7 @@ export const OrderScreen = () => {
   const handleSetNameAndSave = async (clientName) => {
     if (id) {
       try {
-        await SaveExistingOrder({ id, cart, cartSum, clientName, discount });
+        await saveExistingOrder({ id, cart, cartSum, clientName, discount });
         dispatch(cartSlice.actions.clearOrder());
       } catch (error) {
         console.log(error);

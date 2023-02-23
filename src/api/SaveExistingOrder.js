@@ -1,7 +1,7 @@
 import Realm from "realm";
 import { realmConfig } from "../db/schema";
 
-export const SaveExistingOrder = async ({
+export const saveExistingOrder = async ({
   id,
   cart,
   cartSum,
