@@ -14,7 +14,9 @@ export const OrderInfoModal = ({ showModal, onCloseModal, orderInfo }) => {
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
-      <View style={{ flex: 1, alignSelf: "stretch" }}>
+      <View
+        style={{ flex: window.width < 800 ? 1.3 : 1, alignSelf: "stretch" }}
+      >
         <Text numberOfLines={1} style={styles.item}>
           {item.article}
         </Text>
@@ -53,7 +55,7 @@ export const OrderInfoModal = ({ showModal, onCloseModal, orderInfo }) => {
         <View style={styles.modal}>
           <View>
             <Text style={styles.title}>Клієнт: {clientName}</Text>
-            <Text style={styles.title}>Знижка: {discount}</Text>
+            <Text style={styles.title}>Знижка: {discount}%</Text>
           </View>
           <View>
             <FlatList
@@ -106,9 +108,10 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "roboto.medium",
     fontSize: 17,
+    marginBottom: 5,
   },
   listContainer: {
-    height: "65%",
+    height: window.height * 0.45,
   },
   itemContainer: { flexDirection: "row" },
   item: {

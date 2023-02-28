@@ -26,13 +26,27 @@ export class CartSchema extends Realm.Object {
       priceDiscount: "float",
       qty: "string",
       sum: "float",
+      isDiscount: "string",
     },
   };
 }
 
+const migrationFunction = (oldRealm, newRealm) => {
+  if (oldRealm.schemaVersion < 3) {
+    const oldObjects = oldRealm.objects("Cart");
+    const newObjects = newRealm.objects("Cart");
+
+    for (let i = 0; i < oldObjects.length; i++) {
+      newObjects[i].isDiscount = "";
+    }
+  }
+};
+
 const config = {
   // path: "default.realm",
   schema: [Orders, CartSchema],
+  schemaVersion: 3,
+  migration: migrationFunction,
 };
 
 export default createRealmContext(config);

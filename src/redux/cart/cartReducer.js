@@ -16,6 +16,9 @@ export const cartSlice = createSlice({
     addToCart: (state, { payload }) => {
       state.cart = state.cart.concat(payload);
     },
+    addToCartExistingOrder: (state, { payload }) => {
+      state.cart = payload;
+    },
     changeQty: (state, { payload }) => {
       state.cart.map((product) => {
         if (product.article === payload.currentArticle) {
@@ -41,9 +44,12 @@ export const cartSlice = createSlice({
     },
     changeDiscount: (state) => {
       state.cart.map((element) => {
-        element.priceDiscount = (element.price * (100 - state.discount)) / 100;
-        element.sum =
-          (element.qty * (element.price * (100 - state.discount))) / 100;
+        let priceDiscount = (element.price * (100 - state.discount)) / 100;
+        if (element.isDiscount === "Ні") {
+          priceDiscount = element.price;
+        }
+        element.priceDiscount = priceDiscount;
+        element.sum = element.qty * priceDiscount;
       });
     },
     setCurrentClient: (state, { payload }) => {

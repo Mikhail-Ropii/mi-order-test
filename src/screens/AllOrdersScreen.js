@@ -3,9 +3,9 @@ import {
   FlatList,
   View,
   Text,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import { sendOrderByMail } from "../api/sendOrderByMail";
 import { DatePicker } from "../components/DatePicker";
@@ -23,6 +23,8 @@ const { useRealm, useQuery, useObject } = OrdersContext;
 //Redux
 import { useDispatch, useSelector } from "react-redux";
 import { cartSlice } from "../redux/cart/cartReducer";
+
+const window = Dimensions.get("window");
 
 export const AllOrdersScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -108,17 +110,8 @@ export const AllOrdersScreen = ({ navigation }) => {
       (order) => order._id.toString() == selectedOrder
     );
     const { items, _id, clientName } = foundOrder;
-    items.map((el) => {
-      const product = {
-        article: el.article,
-        name: el.name,
-        price: el.price,
-        qty: el.qty,
-        priceDiscount: (el.price * (100 - discount)) / 100,
-        sum: (el.qty * (el.price * (100 - discount))) / 100,
-      };
-      dispatch(cartSlice.actions.addToCart(product));
-    });
+    const normolizItems = JSON.parse(JSON.stringify(items));
+    dispatch(cartSlice.actions.addToCartExistingOrder(normolizItems));
     setShowConfirmChangeModal(false);
     dispatch(cartSlice.actions.changeDiscount());
     dispatch(cartSlice.actions.setCurrentClient({ _id, clientName }));
@@ -165,12 +158,12 @@ export const AllOrdersScreen = ({ navigation }) => {
         style={styles.wrapper}
         onPress={() => handleSelectOrder(item._id)}
       >
-        <View style={{ flex: 7 }}>
+        <View style={{ flex: window.width < 800 ? 5 : 7 }}>
           <Text numberOfLines={1} style={styles.item}>
             {item.clientName}
           </Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1.2 }}>
           <Text style={styles.item}>
             {item.createAt.toJSON().slice(0, 10).split("-").reverse().join("/")}
           </Text>
@@ -242,10 +235,10 @@ export const AllOrdersScreen = ({ navigation }) => {
         </View>
       </View>
       <View style={styles.priceHeader}>
-        <View style={{ flex: 7 }}>
+        <View style={{ flex: window.width < 800 ? 5 : 7 }}>
           <Text style={styles.priceHeaderText}>Клієнт</Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1.2 }}>
           <Text style={styles.priceHeaderText}>Дата</Text>
         </View>
         <View style={{ flex: 1 }}>
@@ -352,7 +345,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     flexWrap: "wrap",
     fontFamily: "roboto.medium",
-    fontSize: 16,
+    fontSize: 15,
     marginRight: 5,
     paddingVertical: 10,
     borderBottomWidth: 1,

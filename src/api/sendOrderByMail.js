@@ -16,12 +16,13 @@ export const sendOrderByMail = async (id) => {
       delete item.price;
       delete item.priceDiscount;
       delete item.sum;
+      delete item.isDiscount;
       return item;
     });
     const response = await axios.post(
       "https://mi-order-server.onrender.com/sendorder",
       {
-        orderItems,
+        items: orderItems,
         clientName,
         managerName,
       }

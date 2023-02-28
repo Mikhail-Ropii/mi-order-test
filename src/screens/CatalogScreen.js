@@ -110,15 +110,20 @@ export const CatalogScreen = () => {
       const currentProduct = foundProducts.filter(
         (product) => product.article == currentArticle
       );
-      const { article, name, price } = currentProduct[0];
+      const { article, name, price, isDiscount } = currentProduct[0];
+      let priceDiscount = (price * (100 - discount)) / 100;
+      if (isDiscount === "Ні") {
+        priceDiscount = price;
+      }
       dispatch(
         cartSlice.actions.addToCart({
           article,
           name,
           price,
-          priceDiscount: (price * (100 - discount)) / 100,
+          priceDiscount,
           qty,
-          sum: ((price * (100 - discount)) / 100) * qty,
+          sum: priceDiscount * qty,
+          isDiscount,
         })
       );
     }
@@ -158,14 +163,14 @@ export const CatalogScreen = () => {
     }
   };
 
-  const renderItem = useMemo(() => ({ item }) => (
+  const renderItem = ({ item }) => (
     <CatalogList
       item={item}
-      selectedProduct={selectedProduct}
       setSelectedProduct={setSelectedProduct}
       addProduct={addProduct}
+      isSelected={selectedProduct === item.article}
     />
-  ));
+  );
 
   return (
     <View style={styles.container}>

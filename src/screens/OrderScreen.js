@@ -1,10 +1,10 @@
 import {
   FlatList,
   Text,
-  ScrollView,
   StyleSheet,
   View,
   TextInput,
+  Dimensions,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import DoubleClick from "react-native-double-tap";
@@ -22,6 +22,8 @@ import { cartSlice } from "../redux/cart/cartReducer";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 
+const window = Dimensions.get("window");
+
 export const OrderScreen = () => {
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
@@ -30,7 +32,7 @@ export const OrderScreen = () => {
   const cart = useSelector((state) => state.cart.cart);
   //State
   const [cartSum, setCartSum] = useState(0);
-  const [showModal, setShowModal] = useState(false);
+  const [showQtyModal, setShowQtyModal] = useState(false);
   const [showClientNameModal, setShowClientNameModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [currentArticle, setCurrentArticle] = useState();
@@ -51,7 +53,7 @@ export const OrderScreen = () => {
   const selectProduct = (item) => {
     setCurrentQty(item.qty);
     setCurrentArticle(item.article);
-    setShowModal(true);
+    setShowQtyModal(true);
   };
 
   const handleConfirmDelete = () => {
@@ -106,7 +108,9 @@ export const OrderScreen = () => {
             {item.article}
           </Text>
         </View>
-        <View style={{ flex: 7, alignSelf: "stretch" }}>
+        <View
+          style={{ flex: window.width < 800 ? 4 : 7, alignSelf: "stretch" }}
+        >
           <DoubleClick doubleTap={() => selectProduct(item)}>
             <Text numberOfLines={1} style={styles.item}>
               {item.name}
@@ -123,7 +127,9 @@ export const OrderScreen = () => {
             {item.priceDiscount.toFixed(2)}
           </Text>
         </View>
-        <View style={{ flex: 0.5, alignSelf: "stretch" }}>
+        <View
+          style={{ flex: window.width < 800 ? 0.8 : 0.5, alignSelf: "stretch" }}
+        >
           <Text numberOfLines={1} style={styles.item}>
             {item.qty}
           </Text>
@@ -134,7 +140,9 @@ export const OrderScreen = () => {
           </Text>
         </View>
       </View>
-      <View style={{ flex: 0.8, alignSelf: "center" }}>
+      <View
+        style={{ flex: window.width < 800 ? 1.3 : 0.8, alignSelf: "center" }}
+      >
         <FontAwesome
           onPress={() => handleOnPressDelete(item.article)}
           name="remove"
@@ -187,7 +195,7 @@ export const OrderScreen = () => {
         <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Код</Text>
         </View>
-        <View style={{ flex: 7 }}>
+        <View style={{ flex: window.width < 800 ? 4 : 7 }}>
           <Text style={styles.priceHeaderText}>Найменування</Text>
         </View>
         <View style={{ flex: 1 }}>
@@ -196,13 +204,13 @@ export const OrderScreen = () => {
         <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Ціна(%)</Text>
         </View>
-        <View style={{ flex: 0.5 }}>
+        <View style={{ flex: window.width < 800 ? 0.8 : 0.5 }}>
           <Text style={styles.priceHeaderText}>Кіл.</Text>
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.priceHeaderText}>Сума</Text>
         </View>
-        <View style={{ flex: 0.8 }}>
+        <View style={{ flex: window.width < 800 ? 1 : 0.8 }}>
           <Text style={styles.priceHeaderText}>Видал.</Text>
         </View>
       </View>
@@ -214,9 +222,9 @@ export const OrderScreen = () => {
         />
       )}
       <OrderModal
-        showModal={showModal}
+        showModal={showQtyModal}
         changeQty={handleChangeQty}
-        onCloseModal={() => setShowModal(false)}
+        onCloseModal={() => setShowQtyModal(false)}
         currentQty={currentQty}
       />
       <ClientNameModal

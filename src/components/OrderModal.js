@@ -6,7 +6,7 @@ export const OrderModal = ({
   showModal,
   changeQty,
   onCloseModal,
-  onSetOffAutoQtyModal,
+  onSetOffAutoQtyModal = null,
   currentQty = "",
 }) => {
   const [numPadImput, setNumPadImput] = useState("");
@@ -53,7 +53,9 @@ export const OrderModal = ({
             activeOpacity={0.7}
             style={styles.cancelBtn}
             onPress={() => {
-              onSetOffAutoQtyModal();
+              if (onSetOffAutoQtyModal) {
+                onSetOffAutoQtyModal();
+              }
               onCloseModal();
               setNumPadImput(currentQty);
             }}

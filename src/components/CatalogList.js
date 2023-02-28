@@ -3,17 +3,15 @@ import DoubleClick from "react-native-double-tap";
 
 export const CatalogList = ({
   item,
-  selectedProduct,
   setSelectedProduct,
   addProduct,
+  isSelected,
 }) => {
   return (
     <View
       style={[
         styles.catalogContainer,
-        {
-          backgroundColor: selectedProduct == item.article ? "#49b1e6" : null,
-        },
+        isSelected && { backgroundColor: "#49b1e6" },
       ]}
     >
       <DoubleClick
