@@ -1,6 +1,11 @@
 import { useEffect, useCallback } from "react";
 import { useFonts } from "expo-font";
-import { StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  StatusBar,
+} from "react-native";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
 import * as SplashScreen from "expo-splash-screen";
@@ -39,6 +44,7 @@ export default function App() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
+      <StatusBar hidden={true} />
       <Provider store={store}>
         <RealmProvider>
           <Main />
