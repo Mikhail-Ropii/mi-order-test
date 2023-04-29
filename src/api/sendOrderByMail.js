@@ -19,14 +19,11 @@ export const sendOrderByMail = async (id) => {
       delete item.isDiscount;
       return item;
     });
-    const response = await axios.post(
-      "https://mi-order-server.onrender.com/sendorder",
-      {
-        items: orderItems,
-        clientName,
-        managerName,
-      }
-    );
+    const response = await axios.post("http://46.36.221.117:3000/sendorder", {
+      items: orderItems,
+      clientName,
+      managerName,
+    });
     db.write(() => {
       currentOrder.status = "Відправлено";
     });

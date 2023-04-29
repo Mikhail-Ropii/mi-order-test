@@ -14,7 +14,7 @@ export const updatePrice = async () => {
   };
   try {
     const response = await axios.get(
-      "https://mi-order-server.onrender.com/getprice",
+      "http://46.36.221.117:3000/getprice",
       config
     );
     const data = JSON.stringify(response.data);

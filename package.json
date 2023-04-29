@@ -1,5 +1,5 @@
 {
-  "name": "mi-order-test",
+  "name": "upi-sales",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start --dev-client",

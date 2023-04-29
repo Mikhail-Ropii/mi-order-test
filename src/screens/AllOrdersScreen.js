@@ -248,7 +248,7 @@ export const AllOrdersScreen = ({ navigation }) => {
           <Text style={styles.priceHeaderText}>Статус</Text>
         </View>
         <View style={{ flex: 0.8 }}>
-          <Text style={styles.priceHeaderText}>Инфо</Text>
+          <Text style={styles.priceHeaderText}>Інфо</Text>
         </View>
       </View>
       <FlatList
