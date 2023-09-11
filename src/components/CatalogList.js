@@ -3,7 +3,7 @@ import DoubleClick from "react-native-double-tap";
 
 export const CatalogList = ({
   item,
-  setSelectedProduct,
+  setCurrentArticle,
   addProduct,
   isSelected,
 }) => {
@@ -16,9 +16,11 @@ export const CatalogList = ({
     >
       <DoubleClick
         singleTap={() => {
-          setSelectedProduct(item.article);
+          setCurrentArticle(item.article);
         }}
-        doubleTap={() => addProduct(item.article)}
+        doubleTap={() => {
+          addProduct(item.article);
+        }}
       >
         <View style={styles.wraper}>
           <View style={styles.itemContainer}>
@@ -56,7 +58,7 @@ export const CatalogList = ({
                 numberOfLines={1}
                 style={[
                   styles.item,
-                  { color: item.isDiscount === "Ні" ? "red" : "inherit" },
+                  { color: item.isDiscount === "Ні" ? "red" : null },
                 ]}
               >
                 {item.price.toFixed(2)}

@@ -29,7 +29,6 @@ export const CatalogScreen = () => {
   const cart = useSelector((state) => state.cart.cart);
   const discount = useSelector((state) => state.cart.discount);
   //State
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [showQtyModal, setShowQtyModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -77,10 +76,11 @@ export const CatalogScreen = () => {
     foundProducts.findIndex((item, idx) => {
       if (item.article == searchValue) {
         index = idx;
-        setSelectedProduct(item.article);
+        setCurrentArticle(item.article);
+        return true;
       }
     });
-    catalogRef.current.scrollToIndex({ index: index, animated: false });
+    catalogRef.current.scrollToIndex({ index, animated: false });
   }, [searchValue]);
 
   const handleChangeQty = (qty) => {
@@ -90,17 +90,15 @@ export const CatalogScreen = () => {
   const addProduct = (art) => {
     const currentProduct = cart.find((product) => product.article === art);
     if (currentProduct) {
+      setShowQtyModal(true);
       setCurrentQty(currentProduct.qty);
       setCurrentArticle(currentProduct.article);
-      setShowQtyModal(true);
       return;
     }
     setCurrentQty("");
+    setShowQtyModal(true);
     const foundItem = foundProducts.find(({ article }) => article == art);
-    if (foundItem) {
-      setShowQtyModal(true);
-      setCurrentArticle(foundItem.article);
-    }
+    setCurrentArticle(foundItem.article);
   };
 
   const addQty = (qty) => {
@@ -166,11 +164,13 @@ export const CatalogScreen = () => {
   const renderItem = ({ item }) => (
     <CatalogList
       item={item}
-      setSelectedProduct={setSelectedProduct}
+      setCurrentArticle={setCurrentArticle}
       addProduct={addProduct}
-      isSelected={selectedProduct === item.article}
+      isSelected={currentArticle === item.article}
     />
   );
+
+  const keyExtractor = (item) => item.article.toString();
 
   return (
     <View style={styles.container}>
@@ -238,7 +238,7 @@ export const CatalogScreen = () => {
         ref={catalogRef}
         data={foundProducts}
         renderItem={renderItem}
-        keyExtractor={(item) => item.article.toString()}
+        keyExtractor={keyExtractor}
       />
       <SearchByArticleModal
         showModal={showSearchModal}

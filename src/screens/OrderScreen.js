@@ -165,7 +165,6 @@ export const OrderScreen = () => {
             numberOfLines={1}
             keyboardType={"numeric"}
             maxLength={2}
-            value={discount}
             onChangeText={(value) =>
               dispatch(cartSlice.actions.setDiscount(parseInt(value)))
             }
