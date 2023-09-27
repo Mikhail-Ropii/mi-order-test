@@ -2,7 +2,12 @@ import { StyleSheet, Modal, View, Text, TouchableOpacity } from "react-native";
 
 export const ConfirmModal = ({ showModal, onConfirm, onReject, children }) => {
   return (
-    <Modal style={styles.modal} visible={showModal} transparent={true}>
+    <Modal
+      style={styles.modal}
+      visible={showModal}
+      transparent={true}
+      statusBarTranslucent={true}
+    >
       <View style={styles.centeredView}>
         <View style={styles.modal}>
           <Text style={styles.title}>{children}</Text>

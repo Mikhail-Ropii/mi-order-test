@@ -27,7 +27,7 @@ export const SearchByArticleModal = ({
   };
 
   return (
-    <Modal visible={showModal} transparent={true}>
+    <Modal visible={showModal} transparent={true} statusBarTranslucent={true}>
       <View style={styles.centeredView}>
         <View style={styles.modal}>
           <Text style={styles.title}>Артикул</Text>

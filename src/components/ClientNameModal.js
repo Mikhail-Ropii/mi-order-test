@@ -28,7 +28,12 @@ export const ClientNameModal = ({
   }, [clientName]);
 
   return (
-    <Modal style={styles.modal} visible={showModal} transparent={true}>
+    <Modal
+      style={styles.modal}
+      visible={showModal}
+      transparent={true}
+      statusBarTranslucent={true}
+    >
       <View style={styles.centeredView}>
         <View style={styles.modal}>
           <Text style={styles.title}>Введіть ім'я клієнта</Text>

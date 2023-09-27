@@ -10,6 +10,7 @@ import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
 import * as SplashScreen from "expo-splash-screen";
 import { Main } from "./src/components/Main";
+
 //DB
 import OrdersContext from "./src/db/schema";
 const { RealmProvider } = OrdersContext;

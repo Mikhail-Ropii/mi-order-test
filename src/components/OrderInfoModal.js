@@ -50,7 +50,7 @@ export const OrderInfoModal = ({ showModal, onCloseModal, orderInfo }) => {
   );
 
   return (
-    <Modal visible={showModal} transparent={true}>
+    <Modal visible={showModal} transparent={true} statusBarTranslucent={true}>
       <View style={styles.container}>
         <View style={styles.modal}>
           <View>
